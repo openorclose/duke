@@ -1,10 +1,13 @@
 package main.java;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Duke {
 
   private Scanner scanner = new Scanner(System.in);
+
+  private ArrayList<String> list = new ArrayList<>();
 
   public static void main(String[] args) {
     String logo = " ____        _        \n"
@@ -28,8 +31,23 @@ public class Duke {
       String userInput = scanner.nextLine();
       if (userInput.equals("bye")) {
         break;
+      } else if (userInput.equals("list")) {
+        printList();
+      } else {
+        addToList(userInput);
       }
-      System.out.println(userInput);
+    }
+  }
+
+  private void addToList(String userInput) {
+    list.add(userInput);
+    System.out.println("added: " + userInput);
+  }
+
+  private void printList() {
+    for (int itemIndex = 0; itemIndex < list.size(); itemIndex += 1) {
+      int oneBasedIndex = itemIndex + 1;
+      System.out.printf("%d. %s\n", oneBasedIndex , list.get(itemIndex));
     }
   }
 }
