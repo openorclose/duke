@@ -16,6 +16,7 @@ public class Task {
     System.out.println(this);
   }
 
+  @Override
   public String toString() {
     return String.format("[%c] %s", getStatusIcon(), description);
   }
