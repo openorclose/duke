@@ -73,6 +73,10 @@ public class Duke {
                         done(command);
                         break;
                         // verify command is correct for todo/deadline/event
+                    } else if (command.matches("(delete )[\\d]+")) {
+                        delete(command);
+                        break;
+                        // verify command is correct for todo/deadline/event
                     } else if (command.matches("(todo).*")) {
                         addToList(command);
                     } else if (command.matches("(deadline).*")) {
@@ -92,13 +96,30 @@ public class Duke {
         return CONTINUE;
     }
 
+    private void delete(String command) throws IOException, DukeException{
+        Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
+        int thingToDo = sc.nextInt(); // one indexed
+        Task removedTask;
+        try {
+            removedTask = todoList.remove(thingToDo - 1);
+            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.write(INDENT + " Noted. I've removed this task: " + "\n");
+            out.write(INDENT + "   " + removedTask + "\n");
+            out.write(INDENT + " Now you have " + todoList.size() + " tasks in the list." + "\n");
+            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.flush();
+        } catch (ArrayIndexOutOfBoundsException e){
+            throw new DukeException("☹ OOPS!!! There is no task " + thingToDo + ".");
+        }
+    }
+
     private void done(String command) throws IOException, DukeException{
         Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
         int thingToDo = sc.nextInt(); // one indexed
         try {
             todoList.get(thingToDo - 1).setState(Task.DONE);
         } catch (ArrayIndexOutOfBoundsException e){
-            throw new DukeException("☹ OOPS!!! There is no item " + thingToDo + ".");
+            throw new DukeException("☹ OOPS!!! There is no task " + thingToDo + ".");
         }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.write(INDENT + " Nice! I've marked this task as done: " + "\n");
