@@ -134,6 +134,9 @@ public class Duke {
         for(Task item: todoList){
             out.write(INDENT + " " + counter++ + "." + item + "\n");
         }
+        if (counter == 1){
+            out.write(INDENT + " Such empty, much wow" + "\n");
+        }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.flush();
     }
