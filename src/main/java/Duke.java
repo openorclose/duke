@@ -1,3 +1,4 @@
+import java.awt.image.TileObserver;
 import java.io.*;
 import java.util.*;
 
@@ -56,38 +57,49 @@ public class Duke {
 
     private int processInput() throws IOException {
         String command = in.readLine();
-        switch (command){
-            case "bye":
-                bye();
-                return EXIT;
-            case "list":
-                listList(command);
-                break;
-            default:
-                // regex matching for more complex commands
+        try {
+            switch (command) {
+                case "bye":
+                    bye();
+                    return EXIT;
+                case "list":
+                    listList(command);
+                    break;
+                default:
+                    // regex matching for more complex commands
 
-                // check if it is `done` command
-                if (command.matches("(done )[\\d]+")) {
-                    done(command);
-                    break;
-                // verify command is correct for todo/deadline/event
-                } else if (command.matches("(todo ).+")) {
-                    addToList(command);
-                } else if (command.matches("(deadline ).+( /by ).+")) {
-                    addToList(command);
-                } else if (command.matches("(event ).+( /at ).+")) {
-                    addToList(command);
-                } else {
-                    break;
-                }
+                    // check if it is `done` command
+                    if (command.matches("(done )[\\d]+")) {
+                        done(command);
+                        break;
+                        // verify command is correct for todo/deadline/event
+                    } else if (command.matches("(todo).*")) {
+                        addToList(command);
+                    } else if (command.matches("(deadline).*")) {
+                        addToList(command);
+                    } else if (command.matches("(event).*")) {
+                        addToList(command);
+                    } else {
+                        throw new DukeException("☹ OOPS!!! I'm sorry, but I don't know what that means :-(");
+                    }
+            }
+        } catch (DukeException e){
+            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.write(INDENT + e.getMessage() + "\n");
+            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.flush();
         }
         return CONTINUE;
     }
 
-    private void done(String command) throws IOException {
+    private void done(String command) throws IOException, DukeException{
         Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
         int thingToDo = sc.nextInt(); // one indexed
-        todoList.get(thingToDo - 1).setState(Task.DONE);
+        try {
+            todoList.get(thingToDo - 1).setState(Task.DONE);
+        } catch (ArrayIndexOutOfBoundsException e){
+            throw new DukeException("☹ OOPS!!! There is no item " + thingToDo + ".");
+        }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.write(INDENT + " Nice! I've marked this task as done: " + "\n");
         out.write(INDENT + "   " + todoList.get(thingToDo - 1) + "\n");
@@ -105,18 +117,39 @@ public class Duke {
         out.flush();
     }
 
-    private void addToList(String command) throws IOException {
-        Scanner sc = new Scanner(command).useDelimiter("(?<=todo)|(?<=deadline)|(?<=event)|(/at)|(/by)");
+    private void addToList(String command) throws IOException, DukeException {
+        if (command.matches("(.*(?<=\\s)(/at|/by)(?>\\s|$|\\z).*){2,}")){
+            throw new DukeException("☹ OOPS!!! There are too many flags in the Task.");
+        }
+        Scanner sc = new Scanner(command).useDelimiter("((?<=todo)|(?<=deadline)|(?<=event)|(?<=\\s)/at|(?<=\\s)/by)(?>[\\s$])");
         String typeOfTask = sc.next();
-        switch (typeOfTask){
+        switch (typeOfTask) {
             case "todo":
-                todoList.add(new Todo(sc.next().trim()));
+                try {
+                    todoList.add(Task.parseTodo(sc.next().trim()));
+                } catch (NoSuchElementException e){
+                    throw new DukeException("☹ OOPS!!! The description of a todo cannot be empty.");
+                }
                 break;
             case "deadline":
-                todoList.add(new Deadline(sc.next().trim(), sc.next().trim()));
+                if(!command.matches("deadline.*/by.*")){
+                    throw new DukeException("☹ OOPS!!! A deadline must have a /by flag.");
+                }
+                try{
+                    todoList.add(Task.parseDeadline(sc.next().trim(), sc.next().trim()));
+                } catch (NoSuchElementException e){
+                    throw new DukeException("☹ OOPS!!! A deadline must have a description and a date.");
+                }
                 break;
             case "event":
-                todoList.add(new Event(sc.next().trim(), sc.next().trim()));
+                if(!command.matches("event.*/at.*")){
+                    throw new DukeException("☹ OOPS!!! An event must have a /at flag.");
+                }
+                try{
+                    todoList.add(Task.parseEvent(sc.next().trim(), sc.next().trim()));
+                } catch (NoSuchElementException e){
+                    throw new DukeException("☹ OOPS!!! An event must have a description and a date.");
+                }
                 break;
         }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
@@ -142,73 +175,109 @@ public class Duke {
         out.flush();
     }
 
-    class Todo extends Task{
-        private Todo(String name) {
-            super(name);
-        }
+}
 
-        @Override
-        public String toString() {
-            return "[T][" + getState() + "] " + getName();
-        }
+class Todo extends Task{
+    Todo(String name) {
+        super(name);
     }
 
-    class Deadline extends Task{
-        private String date;
+    @Override
+    public String toString() {
+        return "[T][" + getState() + "] " + getName();
+    }
+}
 
-        Deadline(String name, String date){
-            super(name);
-            this.date = date;
-        }
+class Deadline extends Task{
+    private String date;
 
-        @Override
-        public String toString() {
-            return "[D][" + getState() + "] " + getName() + " (by: " + date + ")";
-        }
+    Deadline(String name, String date){
+        super(name);
+        this.date = date;
     }
 
-    class Event extends Task{
-        private String date;
+    @Override
+    public String toString() {
+        return "[D][" + getState() + "] " + getName() + " (by: " + date + ")";
+    }
+}
 
-        Event(String name, String date){
-            super(name);
-            this.date = date;
-        }
+class Event extends Task{
+    private String date;
 
-        @Override
-        public String toString() {
-            return "[E][" + getState() + "] " + getName() + " (at: " + date + ")";
-        }
+    Event(String name, String date){
+        super(name);
+        this.date = date;
     }
 
-    class Task{
-        // state constants
-        static final char DONE = '✓';
-        static final char NOT_DONE = '✗';
-
-        private char state; // dont use boolean
-        private String name;
-
-        private Task (String name){
-            this.name = name;
-            this.state = NOT_DONE;
-        }
-
-        public void setState(char state) {
-            this.state = state;
-        }
-
-        public char getState() {
-            return state;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            return "[" + state + "] " + name;
-        }
+    @Override
+    public String toString() {
+        return "[E][" + getState() + "] " + getName() + " (at: " + date + ")";
     }
+}
+
+class Task{
+    // state constants
+    static final char DONE = '✓';
+    static final char NOT_DONE = '✗';
+
+    private char state; // dont use boolean
+    private String name;
+
+    Task (String name){
+        this.name = name;
+        this.state = NOT_DONE;
+    }
+
+    public static Todo parseTodo(String name) throws DukeException {
+        if(name.isEmpty()){
+            throw new DukeException("☹ OOPS!!! The description of a todo cannot be empty.");
+        }
+        return new Todo(name);
+    }
+
+    public static Deadline parseDeadline(String name, String date) throws DukeException {
+        if(name.isEmpty()){
+            throw new DukeException("☹ OOPS!!! The description of a deadline cannot be empty.");
+        } else if(date.isEmpty()){
+            throw new DukeException("☹ OOPS!!! The date of a deadline cannot be empty.");
+        }
+        return new Deadline(name, date);
+    }
+
+    public static Event parseEvent(String name, String date) throws DukeException {
+        if(name.isEmpty()){
+            throw new DukeException("☹ OOPS!!! The description of an event cannot be empty.");
+        } else if(date.isEmpty()){
+            throw new DukeException("☹ OOPS!!! The date of an event cannot be empty.");
+        }
+        return new Event(name, date);
+    }
+
+    public void setState(char state) {
+        this.state = state;
+    }
+
+    public char getState() {
+        return state;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + state + "] " + name;
+    }
+}
+
+class DukeException extends Exception{
+    DukeException(String error){
+        super(error);
+    }
+}
+
+class DukeError extends Error{
+
 }
