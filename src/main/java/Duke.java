@@ -70,8 +70,14 @@ public class Duke {
                 if (command.matches("(done )[\\d]+")) {
                     done(command);
                     break;
-                } else {
+                // verify command is correct for todo/deadline/event
+                } else if (command.matches("(todo ).+")) {
                     addToList(command);
+                } else if (command.matches("(deadline ).+( /by ).+")) {
+                    addToList(command);
+                } else if (command.matches("(event ).+( /at ).+")) {
+                    addToList(command);
+                } else {
                     break;
                 }
         }
@@ -100,9 +106,23 @@ public class Duke {
     }
 
     private void addToList(String command) throws IOException {
-        todoList.add(new Task(command));
+        Scanner sc = new Scanner(command).useDelimiter("(?<=todo)|(?<=deadline)|(?<=event)|(/at)|(/by)");
+        String typeOfTask = sc.next();
+        switch (typeOfTask){
+            case "todo":
+                todoList.add(new Todo(sc.next().trim()));
+                break;
+            case "deadline":
+                todoList.add(new Deadline(sc.next().trim(), sc.next().trim()));
+                break;
+            case "event":
+                todoList.add(new Event(sc.next().trim(), sc.next().trim()));
+                break;
+        }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " added: " + command + "\n");
+        out.write(INDENT + " Got it. I've added this task: " + "\n");
+        out.write(INDENT + "   " + todoList.get(todoList.size() - 1) + "\n");
+        out.write(INDENT + " Now you have " + todoList.size() + " tasks in the list." + "\n");
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.flush();
     }
@@ -122,6 +142,45 @@ public class Duke {
         out.flush();
     }
 
+    class Todo extends Task{
+        private Todo(String name) {
+            super(name);
+        }
+
+        @Override
+        public String toString() {
+            return "[T][" + getState() + "] " + getName();
+        }
+    }
+
+    class Deadline extends Task{
+        private String date;
+
+        Deadline(String name, String date){
+            super(name);
+            this.date = date;
+        }
+
+        @Override
+        public String toString() {
+            return "[D][" + getState() + "] " + getName() + " (by: " + date + ")";
+        }
+    }
+
+    class Event extends Task{
+        private String date;
+
+        Event(String name, String date){
+            super(name);
+            this.date = date;
+        }
+
+        @Override
+        public String toString() {
+            return "[E][" + getState() + "] " + getName() + " (at: " + date + ")";
+        }
+    }
+
     class Task{
         // state constants
         static final char DONE = '✓';
@@ -130,7 +189,7 @@ public class Duke {
         private char state; // dont use boolean
         private String name;
 
-        Task (String name){
+        private Task (String name){
             this.name = name;
             this.state = NOT_DONE;
         }
