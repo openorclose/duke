@@ -2,6 +2,10 @@ package main.java;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import main.java.task.DeadlineTask;
+import main.java.task.EventTask;
+import main.java.task.Task;
+import main.java.task.ToDoTask;
 
 public class Duke {
 
@@ -36,8 +40,18 @@ public class Duke {
       } else if (userInput.startsWith("done ")) {
         int oneBasedIndex = Integer.parseInt(userInput.substring("done ".length()));
         findInListThenMarkAsDone(oneBasedIndex);
-      } else {
-        addToList(userInput);
+      } else if (userInput.startsWith("todo ")) {
+        addTaskToList(new ToDoTask(userInput.substring("todo ".length())));
+      } else if (userInput.startsWith("deadline ")) {
+        String[] arguments = userInput.substring("deadline ".length()).split(" /by ");
+        String deadlineName = arguments[0];
+        String by = arguments[1];
+        addTaskToList(new DeadlineTask(deadlineName, by));
+      } else if (userInput.startsWith("event ")) {
+        String[] arguments = userInput.substring("event ".length()).split(" /at ");
+        String eventName = arguments[0];
+        String at = arguments[1];
+        addTaskToList(new EventTask(eventName, at));
       }
     }
   }
@@ -47,9 +61,11 @@ public class Duke {
     list.get(itemIndex).markAsDoneAndPrint();
   }
 
-  private void addToList(String userInput) {
-    list.add(new Task(userInput));
-    System.out.println("added: " + userInput);
+  private void addTaskToList(Task task) {
+    list.add(task);
+    System.out.println("Got it. I've added this task: ");
+    System.out.println(task);
+    System.out.printf("Now you have %d tasks in the list.\n", list.size());
   }
 
   private void printList() {

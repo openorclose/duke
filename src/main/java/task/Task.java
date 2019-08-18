@@ -1,6 +1,7 @@
-package main.java;
+package main.java.task;
 
 public class Task {
+
   private static char DONE_SYMBOL = '\u2713'; // tick
   private static char NOT_DONE_SYMBOL = '\u2718'; //cross
   private boolean isDone = false;
@@ -10,7 +11,7 @@ public class Task {
     this.description = description;
   }
 
-  void markAsDoneAndPrint() {
+  public void markAsDoneAndPrint() {
     this.isDone = true;
     System.out.println("Nice! I've marked this task as done:");
     System.out.println(this);
