@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 public class Duke {
     // printing constants
@@ -15,6 +16,8 @@ public class Duke {
     private BufferedReader in;
     private OutputStream outStream;
     private Writer out;
+    // data members
+    private List<String> todoList;
 
     public static void main(String[] args){
         new Duke(System.in, System.out).run();
@@ -25,6 +28,8 @@ public class Duke {
         this.in = new BufferedReader(new InputStreamReader(inStream));
         this.outStream = outStream;
         this.out = new PrintWriter(outStream);
+
+        this.todoList = new ArrayList<>();
     }
 
     public int run(){
@@ -55,10 +60,32 @@ public class Duke {
             case "bye":
                 bye();
                 return EXIT;
+            case "list":
+                listList(command);
+                break;
             default:
-                echo(command);
-                return CONTINUE;
+                addToList(command);
+                break;
         }
+        return CONTINUE;
+    }
+
+    private void listList(String command) throws IOException {
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        int counter = 0;
+        for(String item: todoList){
+            out.write(INDENT + " " + counter++ + ". " + item + "\n");
+        }
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.flush();
+    }
+
+    private void addToList(String command) throws IOException {
+        todoList.add(command);
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(INDENT + " added: " + command + "\n");
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.flush();
     }
 
     private void echo(String command) throws IOException {
