@@ -1,7 +1,7 @@
 class Task{
     // state constants
-    static final char DONE = '✓';
-    static final char NOT_DONE = '✗';
+    static final char DONE = '\u2713';
+    static final char NOT_DONE = '\u2717';
 
     private char state; // dont use boolean
     private String name;
@@ -13,25 +13,25 @@ class Task{
 
     public static Todo parseTodo(String name) throws DukeException {
         if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of a todo cannot be empty.");
+            throw new DukeException("\u2639 OOPS!!! The description of a todo cannot be empty.");
         }
         return new Todo(name);
     }
 
     public static Deadline parseDeadline(String name, String date) throws DukeException {
         if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of a deadline cannot be empty.");
+            throw new DukeException("\u2639 OOPS!!! The description of a deadline cannot be empty.");
         } else if(date.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The date of a deadline cannot be empty.");
+            throw new DukeException("\u2639 OOPS!!! The date of a deadline cannot be empty.");
         }
         return new Deadline(name, date);
     }
 
     public static Event parseEvent(String name, String date) throws DukeException {
         if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of an event cannot be empty.");
+            throw new DukeException("\u2639 OOPS!!! The description of an event cannot be empty.");
         } else if(date.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The date of an event cannot be empty.");
+            throw new DukeException("\u2639 OOPS!!! The date of an event cannot be empty.");
         }
         return new Event(name, date);
     }

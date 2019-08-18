@@ -83,7 +83,7 @@ public class Duke {
                     } else if (command.matches("(event).*")) {
                         addToList(command);
                     } else {
-                        throw new DukeException("☹ OOPS!!! I'm sorry, but I don't know what that means :-(");
+                        throw new DukeException("\u2639 OOPS!!! I'm sorry, but I don't know what that means :-(");
                     }
             }
         } catch (DukeException e){
@@ -108,7 +108,7 @@ public class Duke {
             out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
             out.flush();
         } catch (IndexOutOfBoundsException e){
-            throw new DukeException(String.format("☹ OOPS!!! There is no task %d.", thingToDo));
+            throw new DukeException(String.format("\u2639 OOPS!!! There is no task %d.", thingToDo));
         }
     }
 
@@ -118,7 +118,7 @@ public class Duke {
         try {
             todoList.get(thingToDo - 1).setState(Task.DONE);
         } catch (IndexOutOfBoundsException e){
-            throw new DukeException(String.format("☹ OOPS!!! There is no task %d.", thingToDo));
+            throw new DukeException(String.format(" OOPS!!! There is no task %d.", thingToDo));
         }
         out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.write(String.format("%s Nice! I've marked this task as done: \n", INDENT));
@@ -142,7 +142,7 @@ public class Duke {
 
     private void addToList(String command) throws IOException, DukeException {
         if (command.matches("(.*(?<=\\s)(/at|/by)(?>\\s|$|\\z).*){2,}")){
-            throw new DukeException("☹ OOPS!!! There are too many flags in the Task.");
+            throw new DukeException("\u2639 OOPS!!! There are too many flags in the Task.");
         }
         Scanner sc = new Scanner(command).useDelimiter("((?<=todo)|(?<=deadline)|(?<=event)|(?<=\\s)/at|(?<=\\s)/by)(?>[\\s$])");
         String typeOfTask = sc.next();
@@ -151,27 +151,27 @@ public class Duke {
                 try {
                     todoList.add(Task.parseTodo(sc.next().trim()));
                 } catch (NoSuchElementException e){
-                    throw new DukeException("☹ OOPS!!! The description of a todo cannot be empty.");
+                    throw new DukeException("\u2639 OOPS!!! The description of a todo cannot be empty.");
                 }
                 break;
             case "deadline":
                 if(!command.matches("deadline.*/by.*")){
-                    throw new DukeException("☹ OOPS!!! A deadline must have a /by flag.");
+                    throw new DukeException("\u2639 OOPS!!! A deadline must have a /by flag.");
                 }
                 try{
                     todoList.add(Task.parseDeadline(sc.next().trim(), sc.next().trim()));
                 } catch (NoSuchElementException e){
-                    throw new DukeException("☹ OOPS!!! A deadline must have a description and a date.");
+                    throw new DukeException("\u2639 OOPS!!! A deadline must have a description and a date.");
                 }
                 break;
             case "event":
                 if(!command.matches("event.*/at.*")){
-                    throw new DukeException("☹ OOPS!!! An event must have a /at flag.");
+                    throw new DukeException("\u2639 OOPS!!! An event must have a /at flag.");
                 }
                 try{
                     todoList.add(Task.parseEvent(sc.next().trim(), sc.next().trim()));
                 } catch (NoSuchElementException e){
-                    throw new DukeException("☹ OOPS!!! An event must have a description and a date.");
+                    throw new DukeException("\u2639 OOPS!!! An event must have a description and a date.");
                 }
                 break;
         }
