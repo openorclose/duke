@@ -34,18 +34,22 @@ public class Duke {
       System.exit(0);
     });
     parser.addCommand("list", unused -> printList());
-    parser.addCommand("done", oneBasedIndexString -> {
-      int oneBasedIndex = 0;
+    parser.addCommand("done", Parser.generateConsumerExpectingInteger(oneBasedIndex -> {
       try {
-        oneBasedIndex = Integer.parseInt(oneBasedIndexString);
         findInListThenMarkAsDone(oneBasedIndex);
-      } catch (NumberFormatException e) {
-        System.out
-            .println("Opps! I expected an integer corresponding to the task you want to remove.");
       } catch (IndexOutOfBoundsException e) {
-        System.out.printf("Opps! I could not find item %d in your list.\n", oneBasedIndex);
+        System.out.printf("Opps! I could not find item %d in your list.\n",
+            oneBasedIndex);
       }
-    });
+    }));
+    parser.addCommand("delete", Parser.generateConsumerExpectingInteger(oneBasedIndex -> {
+      try {
+        findInListThenDelete(oneBasedIndex);
+      } catch (IndexOutOfBoundsException e) {
+        System.out.printf("Opps! I could not delete item %d in your list as it does not exist.\n",
+            oneBasedIndex);
+      }
+    }));
     parser.addCommand("todo", description -> {
       if (description.equals("")) {
         System.out.println("Opps! I expected a description of your todo task.");
@@ -76,6 +80,17 @@ public class Duke {
     list.add(task);
     System.out.println("Got it. I've added this task: ");
     System.out.println(task);
+  }
+
+  private void findInListThenDelete(int oneBasedIndex) {
+    int itemIndex = oneBasedIndex - 1;
+    Task taskToDelete = list.remove(itemIndex);
+    System.out.println("Noted. I've removed this task: ");
+    System.out.println(taskToDelete);
+    printNumberOfItemsInList();
+  }
+
+  private void printNumberOfItemsInList() {
     System.out.printf("Now you have %d task(s) in the list.\n", list.size());
   }
 

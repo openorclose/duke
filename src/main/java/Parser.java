@@ -23,6 +23,17 @@ class Parser {
     }
   }
 
+  static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer) {
+    return integerString -> {
+      try {
+        consumer.accept(Integer.parseInt(integerString));
+      } catch (NumberFormatException e) {
+        System.out
+            .println("Opps! I expected an integer as the argument");
+      }
+    };
+  }
+
   static Consumer<String> generateConsumerToParseTwoArguments(String splitAt,
       BiConsumer<String, String> consumer) {
     return argumentString -> {
