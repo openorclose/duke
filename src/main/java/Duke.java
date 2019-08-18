@@ -1,4 +1,3 @@
-import java.awt.image.TileObserver;
 import java.io.*;
 import java.util.*;
 
@@ -45,9 +44,9 @@ public class Duke {
     }
 
     private void bye() throws IOException {
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " Bye. Hope to see you again soon!" + "\n");
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        out.write(String.format("%s Bye. Hope to see you again soon!\n", INDENT));
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
@@ -88,9 +87,9 @@ public class Duke {
                     }
             }
         } catch (DukeException e){
-            out.write(INDENT + HORIZONTAL_LINE + "\n");
-            out.write(INDENT + e.getMessage() + "\n");
-            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            out.write(String.format("%s %s\n", INDENT, e.getMessage()));
+            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
             out.flush();
         }
         return CONTINUE;
@@ -102,14 +101,14 @@ public class Duke {
         Task removedTask;
         try {
             removedTask = todoList.remove(thingToDo - 1);
-            out.write(INDENT + HORIZONTAL_LINE + "\n");
-            out.write(INDENT + " Noted. I've removed this task: " + "\n");
-            out.write(INDENT + "   " + removedTask + "\n");
-            out.write(INDENT + " Now you have " + todoList.size() + " tasks in the list." + "\n");
-            out.write(INDENT + HORIZONTAL_LINE + "\n");
+            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            out.write(String.format("%s Noted. I've removed this task: \n", INDENT));
+            out.write(String.format("%s   %s\n", INDENT, removedTask));
+            out.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
+            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
             out.flush();
-        } catch (ArrayIndexOutOfBoundsException e){
-            throw new DukeException("☹ OOPS!!! There is no task " + thingToDo + ".");
+        } catch (IndexOutOfBoundsException e){
+            throw new DukeException(String.format("☹ OOPS!!! There is no task %d.", thingToDo));
         }
     }
 
@@ -118,26 +117,26 @@ public class Duke {
         int thingToDo = sc.nextInt(); // one indexed
         try {
             todoList.get(thingToDo - 1).setState(Task.DONE);
-        } catch (ArrayIndexOutOfBoundsException e){
-            throw new DukeException("☹ OOPS!!! There is no task " + thingToDo + ".");
+        } catch (IndexOutOfBoundsException e){
+            throw new DukeException(String.format("☹ OOPS!!! There is no task %d.", thingToDo));
         }
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " Nice! I've marked this task as done: " + "\n");
-        out.write(INDENT + "   " + todoList.get(thingToDo - 1) + "\n");
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        out.write(String.format("%s Nice! I've marked this task as done: \n", INDENT));
+        out.write(String.format("%s   %s\n", INDENT, todoList.get(thingToDo - 1)));
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
     private void listList(String command) throws IOException {
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         int counter = 1;
         for(Task item: todoList){
-            out.write(INDENT + " " + counter++ + "." + item + "\n");
+            out.write(String.format("%s %d.%s\n", INDENT, counter++, item));
         }
         if (counter == 1){
-            out.write(INDENT + " Such empty, much wow" + "\n");
+            out.write(String.format("%s Such empty, much wow\n", INDENT));
         }
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
@@ -176,124 +175,29 @@ public class Duke {
                 }
                 break;
         }
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " Got it. I've added this task: " + "\n");
-        out.write(INDENT + "   " + todoList.get(todoList.size() - 1) + "\n");
-        out.write(INDENT + " Now you have " + todoList.size() + " tasks in the list." + "\n");
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        out.write(String.format("%s Got it. I've added this task: \n", INDENT));
+        out.write(String.format("%s   %s\n", INDENT, todoList.get(todoList.size() - 1)));
+        out.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
     private void echo(String command) throws IOException {
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " " + command + "\n");
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        out.write(String.format("%s%s\n", INDENT, command));
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
     private void greet() throws IOException {
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
-        out.write(INDENT + " Hello! I'm Duke" + "\n");
-        out.write(INDENT + " What can I do for you?" + "\n");
-        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        out.write(String.format("%s Hello! I'm Duke\n", INDENT));
+        out.write(String.format("%s What can I do for you?\n", INDENT));
+        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.flush();
     }
 
-}
-
-class Todo extends Task{
-    Todo(String name) {
-        super(name);
-    }
-
-    @Override
-    public String toString() {
-        return "[T][" + getState() + "] " + getName();
-    }
-}
-
-class Deadline extends Task{
-    private String date;
-
-    Deadline(String name, String date){
-        super(name);
-        this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "[D][" + getState() + "] " + getName() + " (by: " + date + ")";
-    }
-}
-
-class Event extends Task{
-    private String date;
-
-    Event(String name, String date){
-        super(name);
-        this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "[E][" + getState() + "] " + getName() + " (at: " + date + ")";
-    }
-}
-
-class Task{
-    // state constants
-    static final char DONE = '✓';
-    static final char NOT_DONE = '✗';
-
-    private char state; // dont use boolean
-    private String name;
-
-    Task (String name){
-        this.name = name;
-        this.state = NOT_DONE;
-    }
-
-    public static Todo parseTodo(String name) throws DukeException {
-        if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of a todo cannot be empty.");
-        }
-        return new Todo(name);
-    }
-
-    public static Deadline parseDeadline(String name, String date) throws DukeException {
-        if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of a deadline cannot be empty.");
-        } else if(date.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The date of a deadline cannot be empty.");
-        }
-        return new Deadline(name, date);
-    }
-
-    public static Event parseEvent(String name, String date) throws DukeException {
-        if(name.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The description of an event cannot be empty.");
-        } else if(date.isEmpty()){
-            throw new DukeException("☹ OOPS!!! The date of an event cannot be empty.");
-        }
-        return new Event(name, date);
-    }
-
-    public void setState(char state) {
-        this.state = state;
-    }
-
-    public char getState() {
-        return state;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + state + "] " + name;
-    }
 }
 
 class DukeException extends Exception{
