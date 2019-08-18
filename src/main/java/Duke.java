@@ -17,7 +17,7 @@ public class Duke {
     private OutputStream outStream;
     private Writer out;
     // data members
-    private List<String> todoList;
+    private List<Task> todoList;
 
     public static void main(String[] args){
         new Duke(System.in, System.out).run();
@@ -64,24 +64,43 @@ public class Duke {
                 listList(command);
                 break;
             default:
-                addToList(command);
-                break;
+                // regex matching for more complex commands
+
+                // check if it is `done` command
+                if (command.matches("(done )[\\d]+")) {
+                    done(command);
+                    break;
+                } else {
+                    addToList(command);
+                    break;
+                }
         }
         return CONTINUE;
     }
 
+    private void done(String command) throws IOException {
+        Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
+        int thingToDo = sc.nextInt(); // one indexed
+        todoList.get(thingToDo - 1).setState(Task.DONE);
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.write(INDENT + " Nice! I've marked this task as done: " + "\n");
+        out.write(INDENT + "   " + todoList.get(thingToDo - 1) + "\n");
+        out.write(INDENT + HORIZONTAL_LINE + "\n");
+        out.flush();
+    }
+
     private void listList(String command) throws IOException {
         out.write(INDENT + HORIZONTAL_LINE + "\n");
-        int counter = 0;
-        for(String item: todoList){
-            out.write(INDENT + " " + counter++ + ". " + item + "\n");
+        int counter = 1;
+        for(Task item: todoList){
+            out.write(INDENT + " " + counter++ + "." + item + "\n");
         }
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.flush();
     }
 
     private void addToList(String command) throws IOException {
-        todoList.add(command);
+        todoList.add(new Task(command));
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.write(INDENT + " added: " + command + "\n");
         out.write(INDENT + HORIZONTAL_LINE + "\n");
@@ -101,5 +120,36 @@ public class Duke {
         out.write(INDENT + " What can I do for you?" + "\n");
         out.write(INDENT + HORIZONTAL_LINE + "\n");
         out.flush();
+    }
+
+    class Task{
+        // state constants
+        static final char DONE = '✓';
+        static final char NOT_DONE = '✗';
+
+        private char state; // dont use boolean
+        private String name;
+
+        Task (String name){
+            this.name = name;
+            this.state = NOT_DONE;
+        }
+
+        public void setState(char state) {
+            this.state = state;
+        }
+
+        public char getState() {
+            return state;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + state + "] " + name;
+        }
     }
 }
