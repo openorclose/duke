@@ -41,7 +41,8 @@ class Parser {
         System.out.printf("Opps! I expected two arguments separated by '%s'.\n", splitAt);
         return;
       }
-      String[] arguments = (argumentString + " ").split(splitAt);
+      argumentString += " ";
+      String[] arguments = argumentString.split(splitAt);
       int length = arguments.length;
       if (length > 2) {
         String first = arguments[0];
