@@ -68,11 +68,11 @@ public class Duke {
                     // regex matching for more complex commands
 
                     // check if it is `done` command
-                    if (command.matches("(done )[\\d]+")) {
+                    if (command.matches("(done )[\\d]{1,9}")) {
                         done(command);
                         break;
                         // verify command is correct for todo/deadline/event
-                    } else if (command.matches("(delete )[\\d]+")) {
+                    } else if (command.matches("(delete )[\\d]{1,9}")) {
                         delete(command);
                         break;
                         // verify command is correct for todo/deadline/event
