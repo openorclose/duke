@@ -7,8 +7,8 @@ public class Duke {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
 
     // main loop behavior constants
-    private static final int CONTINUE = 0;
-    private static final int EXIT = 1;
+    private static final int CONTINUE = 1;
+    private static final int EXIT = 2;
 
     // class members
     // iostreams
@@ -33,14 +33,30 @@ public class Duke {
     }
 
     public int run(){
+        int returnCode = 0;
         try {
             greet();
             mainLoop();
         } catch (IOException e) {
-            System.out.println("Stream supplied to Duke is not a valid stream");
-            return 1;
+            e.printStackTrace();
+            returnCode = 1;
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch(IOException e1) {
+
+            }
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch(IOException e2) {
+
+            }
         }
-        return 0;
+        return returnCode;
     }
 
     private void bye() throws IOException {
@@ -51,45 +67,37 @@ public class Duke {
     }
 
     private void mainLoop() throws IOException{
-        while(processInput() == CONTINUE);
+        int code;
+        do {
+            code = processInput();
+            if(code == EXIT){
+                bye();
+            }
+        }while(code == CONTINUE);
     }
 
     private int processInput() throws IOException {
         String command = in.readLine();
         if (command == null){
             // EOF
-            bye();
             return EXIT;
         }
         try {
-            switch (command) {
-                case "bye":
-                    bye();
-                    return EXIT;
-                case "list":
-                    listList(command);
-                    break;
-                default:
-                    // regex matching for more complex commands
-
-                    // check if it is `done` command
-                    if (command.matches("(done )[\\d]{1,9}")) {
-                        done(command);
-                        break;
-                        // verify command is correct for todo/deadline/event
-                    } else if (command.matches("(delete )[\\d]{1,9}")) {
-                        delete(command);
-                        break;
-                        // verify command is correct for todo/deadline/event
-                    } else if (command.matches("(todo).*")) {
-                        addToList(command);
-                    } else if (command.matches("(deadline).*")) {
-                        addToList(command);
-                    } else if (command.matches("(event).*")) {
-                        addToList(command);
-                    } else {
-                        throw new DukeException("\u2639 OOPS!!! I'm sorry, but I don't know what that means :-(");
-                    }
+            if (command.equals("bye")){
+                return EXIT;
+            } else if (command.equals("list")) {
+                listList(command);
+                // check if it is `done` command
+            } else if (command.matches("(done )[\\d]{1,9}")) {
+                done(command);
+                // verify command is correct for delete
+            } else if (command.matches("(delete )[\\d]{1,9}")) {
+                delete(command);
+                // verify command is correct for todo/deadline/event
+            } else if (command.matches("(todo|deadline|event).*")) {
+                addToList(command);
+            } else {
+                throw new DukeException("\u2639 OOPS!!! I'm sorry, but I don't know what that means :-(");
             }
         } catch (DukeException e){
             out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
@@ -123,7 +131,7 @@ public class Duke {
         try {
             todoList.get(thingToDo - 1).setState(Task.DONE);
         } catch (IndexOutOfBoundsException e){
-            throw new DukeException(String.format(" OOPS!!! There is no task %d.", thingToDo));
+            throw new DukeException(String.format("\u2639 OOPS!!! There is no task %d.", thingToDo));
         }
         out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         out.write(String.format("%s Nice! I've marked this task as done: \n", INDENT));
