@@ -56,6 +56,11 @@ public class Duke {
 
     private int processInput() throws IOException {
         String command = in.readLine();
+        if (command == null){
+            // EOF
+            bye();
+            return EXIT;
+        }
         try {
             switch (command) {
                 case "bye":
