@@ -1,4 +1,6 @@
-class Task{
+import java.io.Serializable;
+
+class Task implements Serializable {
     // state constants
     static final char DONE = '\u2713';
     static final char NOT_DONE = '\u2717';
