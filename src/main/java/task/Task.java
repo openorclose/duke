@@ -11,15 +11,17 @@ public class Task {
     this.description = description;
   }
 
-  public void markAsDoneAndPrint() {
+  public void markAsDone() {
     this.isDone = true;
-    System.out.println("Nice! I've marked this task as done:");
-    System.out.println(this);
   }
 
   @Override
   public String toString() {
     return String.format("[%c] %s", getStatusIcon(), description);
+  }
+
+  public String serialise() {
+    return String.format("%b %s", isDone, description);
   }
 
   private char getStatusIcon() {

@@ -2,9 +2,14 @@ package main.java;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import main.java.parser.CommandParser;
+import main.java.parser.ParserUtils;
+import main.java.store.Store;
 import main.java.task.DeadlineTask;
 import main.java.task.EventTask;
 import main.java.task.Task;
+import main.java.parser.TaskParser;
 import main.java.task.ToDoTask;
 
 public class Duke {
@@ -13,7 +18,9 @@ public class Duke {
 
   private ArrayList<Task> list = new ArrayList<>();
 
-  private Parser parser = new Parser();
+  private CommandParser commandParser = new CommandParser();
+  
+  private TaskParser taskParser = new TaskParser();
 
   public static void main(String[] args) {
     String logo = " ____        _        \n"
@@ -29,12 +36,12 @@ public class Duke {
   }
 
   public Duke() {
-    parser.addCommand("bye", unused -> {
+    commandParser.addCommand("bye", unused -> {
       System.out.println("Bye. Hope to see you again soon!");
       System.exit(0);
     });
-    parser.addCommand("list", unused -> printList());
-    parser.addCommand("done", Parser.generateConsumerExpectingInteger(oneBasedIndex -> {
+    commandParser.addCommand("list", unused -> printList());
+    commandParser.addCommand("done", ParserUtils.generateConsumerExpectingInteger(oneBasedIndex -> {
       try {
         findInListThenMarkAsDone(oneBasedIndex);
       } catch (IndexOutOfBoundsException e) {
@@ -42,7 +49,7 @@ public class Duke {
             oneBasedIndex);
       }
     }));
-    parser.addCommand("delete", Parser.generateConsumerExpectingInteger(oneBasedIndex -> {
+    commandParser.addCommand("delete", ParserUtils.generateConsumerExpectingInteger(oneBasedIndex -> {
       try {
         findInListThenDelete(oneBasedIndex);
       } catch (IndexOutOfBoundsException e) {
@@ -50,30 +57,48 @@ public class Duke {
             oneBasedIndex);
       }
     }));
-    parser.addCommand("todo", description -> {
+    commandParser.addCommand("todo", description -> {
       if (description.equals("")) {
         System.out.println("Opps! I expected a description of your todo task.");
       } else {
         addTaskToList(new ToDoTask(description));
       }
     });
-    parser.addCommand("event",
-        Parser.generateConsumerToParseTwoArguments("/at",
+    commandParser.addCommand("event",
+        ParserUtils.generateConsumerToParseTwoArguments(EventTask.ARGUMENTS_SEPARATOR,
             (description, at) -> addTaskToList(new EventTask(description, at))));
-    parser.addCommand("deadline",
-        Parser.generateConsumerToParseTwoArguments("/by",
+    commandParser.addCommand("deadline",
+        ParserUtils.generateConsumerToParseTwoArguments(DeadlineTask.ARGUMENTS_SEPARATOR,
             (description, by) -> addTaskToList(new DeadlineTask(description, by))));
+
+    loadFromDiskToList();
   }
 
   private void startRepl() {
     while (true) {
-      parser.parseAndExecuteCommand(scanner.nextLine().trim());
+      commandParser.parseAndExecuteCommand(scanner.nextLine().trim());
+      saveListToDisk();
     }
+  }
+
+  private void loadFromDiskToList() {
+    Scanner saveFileScanner = Store.retrieveDataAsScanner();
+    while (saveFileScanner.hasNextLine()) {
+      String serialized = saveFileScanner.nextLine();
+      list.add(taskParser.fromSerial(serialized));
+    }
+  }
+
+  private void saveListToDisk() {
+    Store.saveDataIntoFile(list.stream().map(Task::serialise).collect(Collectors.joining("\n")));
   }
 
   private void findInListThenMarkAsDone(int oneBasedIndex) {
     int itemIndex = oneBasedIndex - 1;
-    list.get(itemIndex).markAsDoneAndPrint();
+    Task item = list.get(itemIndex);
+    item.markAsDone();
+    System.out.println("Nice! I've marked this task as done:");
+    System.out.println(item);
   }
 
   private void addTaskToList(Task task) {

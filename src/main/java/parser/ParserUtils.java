@@ -1,29 +1,13 @@
-package main.java;
+package main.java.parser;
 
-import java.util.HashMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-class Parser {
+public class ParserUtils {
 
-  private HashMap<String, Consumer<String>> commands = new HashMap<>();
-
-  void addCommand(String name, Consumer<String> evaluator) {
-    commands.put(name, evaluator);
-  }
-
-  void parseAndExecuteCommand(String userInput) {
-    String trimmedInput = userInput.trim();
-    String command = trimmedInput.split(" ")[0];
-    if (commands.containsKey(command)) {
-      commands.get(command).accept(trimmedInput.substring(command.length()).trim());
-    } else {
-      System.out
-          .printf("Opps! I did not understand what you meant by '%s'\n", trimmedInput);
-    }
-  }
-
-  static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer) {
+  public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer) {
     return integerString -> {
       try {
         consumer.accept(Integer.parseInt(integerString));
@@ -34,12 +18,28 @@ class Parser {
     };
   }
 
-  static Consumer<String> generateConsumerToParseTwoArguments(String splitAt,
+  public static <R> Function<String, R> generateFunctionSplittingAtFirstSpace(
+      BiFunction<String, String, R> biFunction) {
+    return spaceSeparatedString -> {
+      String[] arguments = spaceSeparatedString.split(" ", 2);
+      return biFunction.apply(arguments[0], arguments[1]);
+    };
+  }
+
+  public static Consumer<String> generateConsumerToParseTwoArguments(String splitAt,
       BiConsumer<String, String> consumer) {
+    return argumentString -> generateFunctionToParseTwoArguments(splitAt, (left, right) -> {
+      consumer.accept(left, right);
+      return null;
+    }).apply(argumentString);
+  }
+
+  public static <R> Function<String, R> generateFunctionToParseTwoArguments(String splitAt,
+      BiFunction<String, String, R> biFunction) {
     return argumentString -> {
       if (!argumentString.contains(splitAt)) {
         System.out.printf("Opps! I expected two arguments separated by '%s'.\n", splitAt);
-        return;
+        return null;
       }
       argumentString += " ";
       String[] arguments = argumentString.split(splitAt);
@@ -75,9 +75,10 @@ class Parser {
               "Opps! I could not find anything to the right of '%s'.\n",
               splitAt);
         } else {
-          consumer.accept(left, right);
+          return biFunction.apply(left, right);
         }
       }
+      return null;
     };
   }
 }
