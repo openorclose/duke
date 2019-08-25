@@ -2,6 +2,7 @@ package main.java.parser;
 
 import java.util.HashMap;
 import java.util.function.Function;
+import main.java.ui.Ui;
 
 public class Parser<T> {
 
@@ -17,8 +18,7 @@ public class Parser<T> {
     if (commands.containsKey(command)) {
       return commands.get(command).apply(trimmedInput.substring(command.length()).trim());
     } else {
-      System.out
-          .printf("Opps! I did not understand what you meant by '%s'\n", trimmedInput);
+      Ui.error(String.format("Opps! I did not understand what you meant by '%s'\n", trimmedInput));
       return null;
     }
   }

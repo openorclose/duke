@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import main.java.ui.Ui;
 
 public class Store {
 
@@ -26,7 +27,7 @@ public class Store {
       bufferedWriter.write(data);
       bufferedWriter.flush();
     } catch (IOException e) {
-      System.out.println("Opps! Unable to save to file.");
+      Ui.error("Opps! Unable to save to file.");
     }
   }
 }

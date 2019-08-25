@@ -8,6 +8,7 @@ import main.java.task.DeadlineTask;
 import main.java.task.EventTask;
 import main.java.task.Task;
 import main.java.task.ToDoTask;
+import main.java.ui.Ui;
 
 public class TaskParser {
 
@@ -46,7 +47,7 @@ public class TaskParser {
       try {
         return timedTaskConstructor.apply(description, DateParser.stringToDate(dateString));
       } catch (DateTimeParseException e) {
-        System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+        Ui.error("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
             + "\n\t(e.g. 31/01/2019 2359)");
         return null;
       }

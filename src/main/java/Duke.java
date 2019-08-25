@@ -1,18 +1,17 @@
 package main.java;
 
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import main.java.parser.CommandParser;
 import main.java.parser.ParserUtils;
+import main.java.parser.TaskParser;
 import main.java.store.Store;
 import main.java.task.DeadlineTask;
 import main.java.task.EventTask;
 import main.java.task.Task;
-import main.java.parser.TaskParser;
 import main.java.task.ToDoTask;
-import main.java.parser.DateParser;
+import main.java.ui.Ui;
 
 public class Duke {
 
@@ -30,8 +29,8 @@ public class Duke {
         + "| | | | | | | |/ / _ \\\n"
         + "| |_| | |_| |   <  __/\n"
         + "|____/ \\__,_|_|\\_\\___|\n";
-    System.out.println("Hello from\n" + logo);
-    System.out.println("What can I do for you?");
+    Ui.println("Hello from\n" + logo);
+    Ui.println("What can I do for you?");
 
     Duke duke = new Duke();
     duke.startRepl();
@@ -39,7 +38,7 @@ public class Duke {
 
   public Duke() {
     commandParser.addCommand("bye", unused -> {
-      System.out.println("Bye. Hope to see you again soon!");
+      Ui.println("Bye. Hope to see you again soon!");
       System.exit(0);
     });
     commandParser.addCommand("list", unused -> printList());
@@ -47,8 +46,8 @@ public class Duke {
       try {
         findInListThenMarkAsDone(oneBasedIndex);
       } catch (IndexOutOfBoundsException e) {
-        System.out.printf("Opps! I could not find item %d in your list.\n",
-            oneBasedIndex);
+        Ui.error(String.format("Opps! I could not find item %d in your list.\n",
+            oneBasedIndex));
       }
     }));
     commandParser
@@ -56,14 +55,13 @@ public class Duke {
           try {
             findInListThenDelete(oneBasedIndex);
           } catch (IndexOutOfBoundsException e) {
-            System.out
-                .printf("Opps! I could not delete item %d in your list as it does not exist.\n",
-                    oneBasedIndex);
+            Ui.error(String.format("Opps! I could not delete item %d in your list as it does not exist.\n",
+                    oneBasedIndex));
           }
         }));
     commandParser.addCommand("todo", description -> {
       if (description.equals("")) {
-        System.out.println("Opps! I expected a description of your todo task.");
+        Ui.error("Opps! I expected a description of your todo task.");
       } else {
         addTaskToList(new ToDoTask(description));
       }
@@ -108,40 +106,40 @@ public class Duke {
     int itemIndex = oneBasedIndex - 1;
     Task item = list.get(itemIndex);
     item.markAsDone();
-    System.out.println("Nice! I've marked this task as done:");
-    System.out.println(item);
+    Ui.println("Nice! I've marked this task as done:");
+    Ui.println(item.toString());
   }
 
   private void addTaskToList(Task task) {
     list.add(task);
-    System.out.println("Got it. I've added this task: ");
-    System.out.println(task);
+    Ui.println("Got it. I've added this task: ");
+    Ui.println(task.toString());
   }
 
   private void findInListThenDelete(int oneBasedIndex) {
     int itemIndex = oneBasedIndex - 1;
     Task taskToDelete = list.remove(itemIndex);
-    System.out.println("Noted. I've removed this task: ");
-    System.out.println(taskToDelete);
+    Ui.println("Noted. I've removed this task: ");
+    Ui.println(taskToDelete.toString());
     printNumberOfItemsInList();
   }
 
   private void printNumberOfItemsInList() {
-    System.out.printf("Now you have %d task(s) in the list.\n", list.size());
+    Ui.printf("Now you have %d task(s) in the list.\n", list.size());
   }
 
   private void printList() {
     int length = list.size();
     if (length == 0) {
-      System.out.println("Yay! You don't have any tasks!");
+      Ui.println("Yay! You don't have any tasks!");
     } else if (length == 1) {
-      System.out.println("You have one task in your list:");
-      System.out.println("1. " + list.get(0));
+      Ui.println("You have one task in your list:");
+      Ui.println("1. " + list.get(0));
     } else {
-      System.out.println("Here are the tasks in your list:");
+      Ui.println("Here are the tasks in your list:");
       for (int itemIndex = 0; itemIndex < length; itemIndex += 1) {
         int oneBasedIndex = itemIndex + 1;
-        System.out.printf("%d. %s\n", oneBasedIndex, list.get(itemIndex));
+        Ui.printf("%d. %s\n", oneBasedIndex, list.get(itemIndex));
       }
     }
   }
