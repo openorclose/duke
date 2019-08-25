@@ -1,5 +1,6 @@
 package main.java;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import main.java.task.EventTask;
 import main.java.task.Task;
 import main.java.parser.TaskParser;
 import main.java.task.ToDoTask;
+import main.java.parser.DateParser;
 
 public class Duke {
 
@@ -19,7 +21,7 @@ public class Duke {
   private ArrayList<Task> list = new ArrayList<>();
 
   private CommandParser commandParser = new CommandParser();
-  
+
   private TaskParser taskParser = new TaskParser();
 
   public static void main(String[] args) {
@@ -65,12 +67,25 @@ public class Duke {
       }
     });
     commandParser.addCommand("event",
-        ParserUtils.generateConsumerToParseTwoArguments(EventTask.ARGUMENTS_SEPARATOR,
-            (description, at) -> addTaskToList(new EventTask(description, at))));
+        ParserUtils.generateConsumerToParseTwoArguments("/at",
+            (description, at) -> {
+              try {
+                addTaskToList(new EventTask(description, DateParser.stringToDate(at)));
+              } catch (DateTimeParseException e) {
+                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+                    + "\n\t(e.g. 31/01/2019 2359.)");
+              }
+            }));
     commandParser.addCommand("deadline",
-        ParserUtils.generateConsumerToParseTwoArguments(DeadlineTask.ARGUMENTS_SEPARATOR,
-            (description, by) -> addTaskToList(new DeadlineTask(description, by))));
-
+        ParserUtils.generateConsumerToParseTwoArguments("/by",
+            (description, by) -> {
+              try {
+                addTaskToList(new DeadlineTask(description, DateParser.stringToDate(by)));
+              } catch (DateTimeParseException e) {
+                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+                    + "\n\t(e.g. 31/01/2019 2359.)");
+              }
+            }));
     loadFromDiskToList();
   }
 
