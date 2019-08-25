@@ -1,11 +1,13 @@
 package main.java;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import main.java.task.DeadlineTask;
 import main.java.task.EventTask;
 import main.java.task.Task;
 import main.java.task.ToDoTask;
+import main.parser.DateParser;
 
 public class Duke {
 
@@ -59,10 +61,24 @@ public class Duke {
     });
     parser.addCommand("event",
         Parser.generateConsumerToParseTwoArguments("/at",
-            (description, at) -> addTaskToList(new EventTask(description, at))));
+            (description, at) -> {
+              try {
+                addTaskToList(new EventTask(description, DateParser.stringToDate(at)));
+              } catch (DateTimeParseException e) {
+                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+                    + "\n\t(e.g. 31/01/2019 2359.)");
+              }
+            }));
     parser.addCommand("deadline",
         Parser.generateConsumerToParseTwoArguments("/by",
-            (description, by) -> addTaskToList(new DeadlineTask(description, by))));
+            (description, by) -> {
+              try {
+                addTaskToList(new DeadlineTask(description, DateParser.stringToDate(by)));
+              } catch (DateTimeParseException e) {
+                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+                    + "\n\t(e.g. 31/01/2019 2359.)");
+              }
+            }));
   }
 
   private void startRepl() {
