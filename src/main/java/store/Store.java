@@ -1,4 +1,4 @@
-package main.java.store;
+package store;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import main.java.ui.Ui;
+import ui.Ui;
 
 public class Store {
 

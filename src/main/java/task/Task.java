@@ -1,9 +1,9 @@
-package main.java.task;
+package task;
 
 public class Task {
 
-  private static char DONE_SYMBOL = '\u2713'; // tick
-  private static char NOT_DONE_SYMBOL = '\u2718'; //cross
+  private static char DONE_SYMBOL = '/'; // tick
+  private static char NOT_DONE_SYMBOL = 'X'; //cross
   private boolean isDone = false;
   private String description;
 

@@ -1,4 +1,4 @@
-package main.java.parser;
+package parser;
 
 import java.util.function.Consumer;
 

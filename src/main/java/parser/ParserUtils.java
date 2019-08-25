@@ -1,10 +1,10 @@
-package main.java.parser;
+package parser;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import main.java.ui.Ui;
+import ui.Ui;
 
 public class ParserUtils {
 

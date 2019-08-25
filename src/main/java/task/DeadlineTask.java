@@ -1,7 +1,7 @@
-package main.java.task;
+package task;
 
 import java.time.LocalDateTime;
-import main.java.parser.DateParser;
+import parser.DateParser;
 
 public class DeadlineTask extends Task {
 

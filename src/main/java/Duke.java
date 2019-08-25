@@ -1,17 +1,15 @@
-package main.java;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-import main.java.parser.CommandParser;
-import main.java.parser.ParserUtils;
-import main.java.parser.TaskParser;
-import main.java.store.Store;
-import main.java.task.DeadlineTask;
-import main.java.task.EventTask;
-import main.java.task.Task;
-import main.java.task.ToDoTask;
-import main.java.ui.Ui;
+import parser.CommandParser;
+import parser.ParserUtils;
+import parser.TaskParser;
+import store.Store;
+import task.DeadlineTask;
+import task.EventTask;
+import task.Task;
+import task.ToDoTask;
+import ui.Ui;
 
 public class Duke {
 

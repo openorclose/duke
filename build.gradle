@@ -3,6 +3,10 @@ plugins {
     id 'application'
 }
 
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
+}
+
 group 'seedu.duke'
 version '0.1.0'
 
@@ -12,5 +16,13 @@ repositories {
 
 application {
     // Change this to your main class.
-    mainClassName = "seedu.duke.Duke"
+    mainClassName = "Duke"
+}
+
+run {
+    standardInput = System.in
+}
+
+test {
+    useJUnitPlatform()
 }

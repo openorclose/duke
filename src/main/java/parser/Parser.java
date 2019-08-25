@@ -1,8 +1,8 @@
-package main.java.parser;
+package parser;
 
 import java.util.HashMap;
 import java.util.function.Function;
-import main.java.ui.Ui;
+import ui.Ui;
 
 public class Parser<T> {
 

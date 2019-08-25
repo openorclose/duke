@@ -1,14 +1,14 @@
-package main.java.parser;
+package parser;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import main.java.task.DeadlineTask;
-import main.java.task.EventTask;
-import main.java.task.Task;
-import main.java.task.ToDoTask;
-import main.java.ui.Ui;
+import task.DeadlineTask;
+import task.EventTask;
+import task.Task;
+import task.ToDoTask;
+import ui.Ui;
 
 public class TaskParser {
 
