@@ -25,7 +25,7 @@ public class EventTask extends Task {
         EventTask.EVENT_TASK_SYMBOL,
         super.serialise(),
         EventTask.ARGUMENTS_SEPARATOR,
-        at
+        DateParser.dateToString(at)
     );
   }
 }

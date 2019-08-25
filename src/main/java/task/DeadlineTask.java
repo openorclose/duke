@@ -26,7 +26,7 @@ public class DeadlineTask extends Task {
         DeadlineTask.DEADLINE_TASK_SYMBOL,
         super.serialise(),
         DeadlineTask.ARGUMENTS_SEPARATOR,
-        by
+        DateParser.dateToString(by)
     );
   }
 }

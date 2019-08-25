@@ -51,14 +51,16 @@ public class Duke {
             oneBasedIndex);
       }
     }));
-    commandParser.addCommand("delete", ParserUtils.generateConsumerExpectingInteger(oneBasedIndex -> {
-      try {
-        findInListThenDelete(oneBasedIndex);
-      } catch (IndexOutOfBoundsException e) {
-        System.out.printf("Opps! I could not delete item %d in your list as it does not exist.\n",
-            oneBasedIndex);
-      }
-    }));
+    commandParser
+        .addCommand("delete", ParserUtils.generateConsumerExpectingInteger(oneBasedIndex -> {
+          try {
+            findInListThenDelete(oneBasedIndex);
+          } catch (IndexOutOfBoundsException e) {
+            System.out
+                .printf("Opps! I could not delete item %d in your list as it does not exist.\n",
+                    oneBasedIndex);
+          }
+        }));
     commandParser.addCommand("todo", description -> {
       if (description.equals("")) {
         System.out.println("Opps! I expected a description of your todo task.");
@@ -66,26 +68,20 @@ public class Duke {
         addTaskToList(new ToDoTask(description));
       }
     });
-    commandParser.addCommand("event",
-        ParserUtils.generateConsumerToParseTwoArguments("/at",
-            (description, at) -> {
-              try {
-                addTaskToList(new EventTask(description, DateParser.stringToDate(at)));
-              } catch (DateTimeParseException e) {
-                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
-                    + "\n\t(e.g. 31/01/2019 2359.)");
-              }
-            }));
-    commandParser.addCommand("deadline",
-        ParserUtils.generateConsumerToParseTwoArguments("/by",
-            (description, by) -> {
-              try {
-                addTaskToList(new DeadlineTask(description, DateParser.stringToDate(by)));
-              } catch (DateTimeParseException e) {
-                System.out.println("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
-                    + "\n\t(e.g. 31/01/2019 2359.)");
-              }
-            }));
+    commandParser.addCommand("event", argumentsString -> {
+      Task task = TaskParser.generateTimedTaskParser(EventTask.ARGUMENTS_SEPARATOR,
+          EventTask::new).apply(argumentsString);
+      if (task != null) {
+        addTaskToList(task);
+      }
+    });
+    commandParser.addCommand("deadline", argumentsString -> {
+      Task task = TaskParser.generateTimedTaskParser(DeadlineTask.ARGUMENTS_SEPARATOR,
+          DeadlineTask::new).apply(argumentsString);
+      if (task != null) {
+        addTaskToList(task);
+      }
+    });
     loadFromDiskToList();
   }
 
