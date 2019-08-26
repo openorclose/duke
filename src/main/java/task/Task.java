@@ -29,4 +29,8 @@ public abstract class Task {
   private char getStatusIcon() {
     return isDone ? DONE_SYMBOL : NOT_DONE_SYMBOL;
   }
+
+  public boolean matches(String query) {
+    return description.toLowerCase().contains(query.toLowerCase());
+  }
 }
