@@ -5,11 +5,20 @@ import java.util.function.Function;
 import task.Task;
 import ui.Ui;
 
+/**
+ * Command to find a task.
+ */
 public class FindCommand implements Command {
 
   private final Ui ui;
   private final Function<String, ArrayList<Task>> finder;
 
+  /**
+   * Instantiates a new Find command.
+   *
+   * @param ui     the ui
+   * @param finder the finder
+   */
   public FindCommand(Ui ui, Function<String, ArrayList<Task>> finder) {
 
     this.ui = ui;
