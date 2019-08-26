@@ -22,7 +22,8 @@ public class ParserUtils {
    * @param errorOutputter the error outputter
    * @return the transformed consumer
    */
-  public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer, ErrorOutputter errorOutputter) {
+ public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer,
+      ErrorOutputter errorOutputter) {
     return integerString -> {
       try {
         consumer.accept(Integer.parseInt(integerString));
@@ -76,7 +77,8 @@ public class ParserUtils {
       BiFunction<String, String, R> biFunction, ErrorOutputter errorOutputter) {
     return argumentString -> {
       if (!argumentString.contains(splitAt)) {
-        errorOutputter.accept(String.format("Opps! I expected two arguments separated by '%s'.\n", splitAt));
+        errorOutputter
+            .accept(String.format("Opps! I expected two arguments separated by '%s'.\n", splitAt));
         return null;
       }
       argumentString += " ";
@@ -88,15 +90,16 @@ public class ParserUtils {
         String allButFirst = argumentString.substring(first.length() + splitAt.length());
         String allButLast = argumentString
             .substring(0, argumentString.length() - last.length() - splitAt.length());
-        errorOutputter.accept(String.format("Opps! I see %d '%s's, and cannot be sure what you wanted. \n"
-                + "For example, you could mean:\n\n"
-                + "\t%s\n\t%s\n\t%s\n\n"
-                + "\t---OR---\n\n"
-                + "\t%s\n\t%s\n\t%s\n\n"
-                + "Do not use '%s' in your arguments to avoid this issue.\n",
-            length - 1, splitAt, first.trim(), splitAt, allButFirst.trim(), allButLast.trim(),
-            splitAt,
-            last.trim(), splitAt));
+        errorOutputter
+            .accept(String.format("Opps! I see %d '%s's, and cannot be sure what you wanted. \n"
+                    + "For example, you could mean:\n\n"
+                    + "\t%s\n\t%s\n\t%s\n\n"
+                    + "\t---OR---\n\n"
+                    + "\t%s\n\t%s\n\t%s\n\n"
+                    + "Do not use '%s' in your arguments to avoid this issue.\n",
+                length - 1, splitAt, first.trim(), splitAt, allButFirst.trim(), allButLast.trim(),
+                splitAt,
+                last.trim(), splitAt));
       } else {
         String left = arguments[0].trim();
         String right = arguments[1].trim();
