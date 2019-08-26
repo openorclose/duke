@@ -1,5 +1,6 @@
 import command.ByeCommand;
 import command.DeleteCommand;
+import command.FindCommand;
 import command.MarkAsDoneCommand;
 import command.PrintListCommand;
 import command.task.AddDeadlineTaskCommand;
@@ -72,6 +73,7 @@ public class Duke {
     commandParser.add(new AddTodoTaskCommand(ui::error, this::addTaskToList));
     commandParser.add(new AddEventTaskCommand(ui::error, this::addTaskToList));
     commandParser.add(new AddDeadlineTaskCommand(ui::error, this::addTaskToList));
+    commandParser.add(new FindCommand(ui, this::findTasksMatchingQuery));
     loadFromDiskToList();
   }
 
@@ -154,5 +156,12 @@ public class Duke {
         ui.printf("%d. %s\n", oneBasedIndex, list.get(itemIndex));
       }
     }
+  }
+
+  private ArrayList<Task> findTasksMatchingQuery(String query) {
+    return list
+        .stream()
+        .filter(task -> task.matches(query))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 }
