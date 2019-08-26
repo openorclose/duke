@@ -1,31 +1,24 @@
 package task;
 
 import java.time.LocalDateTime;
-import parser.DateParser;
 
-public class EventTask extends Task {
+public class EventTask extends TimedTask {
 
-  private LocalDateTime at;
+  private static final String SEPARATOR = "at";
+  public static final String ARGUMENTS_SEPARATOR = "/" + SEPARATOR;
   public static final char EVENT_TASK_SYMBOL = 'E';
-  public static final String ARGUMENTS_SEPARATOR = "/at";
 
   public EventTask(String description, LocalDateTime at) {
-    super(description);
-    this.at = at;
+    super(description, at);
   }
 
   @Override
-  public String toString() {
-    return String.format("[%c]%s (:at %s)", EventTask.EVENT_TASK_SYMBOL, super.toString(), DateParser.dateToString(at));
+  public String separator() {
+    return EventTask.SEPARATOR;
   }
 
-  public String serialise() {
-    return String.format(
-        "%c %s %s %s",
-        EventTask.EVENT_TASK_SYMBOL,
-        super.serialise(),
-        EventTask.ARGUMENTS_SEPARATOR,
-        DateParser.dateToString(at)
-    );
+  @Override
+  public char symbol() {
+    return EventTask.EVENT_TASK_SYMBOL;
   }
 }

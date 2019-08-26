@@ -1,32 +1,24 @@
 package task;
 
 import java.time.LocalDateTime;
-import parser.DateParser;
 
-public class DeadlineTask extends Task {
+public class DeadlineTask extends TimedTask {
 
   public static final char DEADLINE_TASK_SYMBOL = 'D';
-  public static final String ARGUMENTS_SEPARATOR = "/by";
-  private LocalDateTime by;
+  private static final String SEPARATOR = "by";
+  public static final String ARGUMENTS_SEPARATOR = "/" + SEPARATOR;
 
   public DeadlineTask(String description, LocalDateTime by) {
-    super(description);
-    this.by = by;
+    super(description, by);
   }
 
   @Override
-  public String toString() {
-    return String
-        .format("[%c]%s (:by %s)", DeadlineTask.DEADLINE_TASK_SYMBOL, super.toString(), DateParser.dateToString(by));
+  public String separator() {
+    return DeadlineTask.SEPARATOR;
   }
 
-  public String serialise() {
-    return String.format(
-        "%c %s %s %s",
-        DeadlineTask.DEADLINE_TASK_SYMBOL,
-        super.serialise(),
-        DeadlineTask.ARGUMENTS_SEPARATOR,
-        DateParser.dateToString(by)
-    );
+  @Override
+  public char symbol() {
+    return DeadlineTask.DEADLINE_TASK_SYMBOL;
   }
 }

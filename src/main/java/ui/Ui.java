@@ -1,19 +1,24 @@
 package ui;
 
 public class Ui {
-  public static void print(String string) {
+  public void print(String string) {
     System.out.print(string);
   }
 
-  public static void println(String string) {
+  public void println(String string) {
     System.out.println(string);
   }
 
-  public static void printf(String format, Object... args) {
+  public void printf(String format, Object... args) {
     System.out.printf(format, args);
   }
 
-  public static void error(String message) {
+  public void error(String message) {
     System.out.println(message);
+  }
+
+  public void exit(String message) {
+    System.out.println(message);
+    System.exit(0);
   }
 }

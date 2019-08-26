@@ -7,6 +7,11 @@ import ui.Ui;
 public class Parser<T> {
 
   private HashMap<String, Function<String, T>> commands = new HashMap<>();
+  private Ui ui;
+
+  public Parser(Ui ui) {
+    this.ui = ui;
+  }
 
   public void addSubParser(String name, Function<String, T> evaluator) {
     commands.put(name, evaluator);
@@ -18,7 +23,7 @@ public class Parser<T> {
     if (commands.containsKey(command)) {
       return commands.get(command).apply(trimmedInput.substring(command.length()).trim());
     } else {
-      Ui.error(String.format("Opps! I did not understand what you meant by '%s'\n", trimmedInput));
+      ui.error(String.format("Opps! I did not understand what you meant by '%s'\n", trimmedInput));
       return null;
     }
   }

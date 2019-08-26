@@ -1,5 +1,6 @@
 package parser;
 
+import command.task.AddTaskCommand;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.function.BiFunction;
@@ -8,21 +9,23 @@ import task.DeadlineTask;
 import task.EventTask;
 import task.Task;
 import task.ToDoTask;
+import type.ErrorOutputter;
 import ui.Ui;
 
 public class TaskParser {
 
-  private Parser<Task> parser = new Parser<>();
+  private Parser<Task> parser;
 
-  public TaskParser() {
+  public TaskParser(Ui ui) {
+    this.parser = new Parser<>(ui);
     addTaskSubParser(ToDoTask.TO_DO_SYMBOL, ToDoTask::new);
     addTaskSubParser(EventTask.EVENT_TASK_SYMBOL,
         TaskParser.generateTimedTaskParser(EventTask.ARGUMENTS_SEPARATOR,
-            EventTask::new
+            EventTask::new, ui::error
         ));
     addTaskSubParser(DeadlineTask.DEADLINE_TASK_SYMBOL,
         TaskParser.generateTimedTaskParser(DeadlineTask.ARGUMENTS_SEPARATOR,
-            DeadlineTask::new));
+            DeadlineTask::new, ui::error));
   }
 
   private void addTaskSubParser(char type, Function<String, Task> creator) {
@@ -42,15 +45,18 @@ public class TaskParser {
     return parser.parse(serial);
   }
 
-  public static Function<String, Task> generateTimedTaskParser(String separator, BiFunction<String, LocalDateTime, Task> timedTaskConstructor) {
+  public static Function<String, Task> generateTimedTaskParser(
+      String separator,
+      BiFunction<String, LocalDateTime, Task> timedTaskConstructor,
+      ErrorOutputter errorOutputter) {
     return ParserUtils.generateFunctionToParseTwoArguments(separator, (description, dateString) -> {
       try {
         return timedTaskConstructor.apply(description, DateParser.stringToDate(dateString));
       } catch (DateTimeParseException e) {
-        Ui.error("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
+        errorOutputter.accept("Opps! I expected a date in the format: DD/MM/YYYY HHmm"
             + "\n\t(e.g. 31/01/2019 2359)");
         return null;
       }
-    });
+    }, errorOutputter);
   }
 }

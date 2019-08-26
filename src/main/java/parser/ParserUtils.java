@@ -4,16 +4,17 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import type.ErrorOutputter;
 import ui.Ui;
 
 public class ParserUtils {
 
-  public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer) {
+  public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer, ErrorOutputter errorOutputter) {
     return integerString -> {
       try {
         consumer.accept(Integer.parseInt(integerString));
       } catch (NumberFormatException e) {
-        Ui.error("Opps! I expected an integer as the argument");
+        errorOutputter.accept("Opps! I expected an integer as the argument");
       }
     };
   }
@@ -27,18 +28,18 @@ public class ParserUtils {
   }
 
   public static Consumer<String> generateConsumerToParseTwoArguments(String splitAt,
-      BiConsumer<String, String> consumer) {
+      BiConsumer<String, String> consumer, ErrorOutputter errorOutputter) {
     return argumentString -> generateFunctionToParseTwoArguments(splitAt, (left, right) -> {
       consumer.accept(left, right);
       return null;
-    }).apply(argumentString);
+    }, errorOutputter).apply(argumentString);
   }
 
   public static <R> Function<String, R> generateFunctionToParseTwoArguments(String splitAt,
-      BiFunction<String, String, R> biFunction) {
+      BiFunction<String, String, R> biFunction, ErrorOutputter errorOutputter) {
     return argumentString -> {
       if (!argumentString.contains(splitAt)) {
-        Ui.error(String.format("Opps! I expected two arguments separated by '%s'.\n", splitAt));
+        errorOutputter.accept(String.format("Opps! I expected two arguments separated by '%s'.\n", splitAt));
         return null;
       }
       argumentString += " ";
@@ -50,7 +51,7 @@ public class ParserUtils {
         String allButFirst = argumentString.substring(first.length() + splitAt.length());
         String allButLast = argumentString
             .substring(0, argumentString.length() - last.length() - splitAt.length());
-        Ui.error(String.format("Opps! I see %d '%s's, and cannot be sure what you wanted. \n"
+        errorOutputter.accept(String.format("Opps! I see %d '%s's, and cannot be sure what you wanted. \n"
                 + "For example, you could mean:\n\n"
                 + "\t%s\n\t%s\n\t%s\n\n"
                 + "\t---OR---\n\n"
@@ -63,15 +64,15 @@ public class ParserUtils {
         String left = arguments[0].trim();
         String right = arguments[1].trim();
         if ("".equals(left + right)) {
-          Ui.error(String.format(
+          errorOutputter.accept(String.format(
               "Opps! I could not find anything to the left and right of '%s'.\n",
               splitAt));
         } else if (left.equals("")) {
-          Ui.error(String.format(
+          errorOutputter.accept(String.format(
               "Opps! I could not find anything to the left of '%s'.\n",
               splitAt));
         } else if (right.equals("")) {
-          Ui.error(String.format(
+          errorOutputter.accept(String.format(
               "Opps! I could not find anything to the right of '%s'.\n",
               splitAt));
         } else {

@@ -1,13 +1,13 @@
 package task;
 
-public class Task {
+public abstract class Task {
 
   private static char DONE_SYMBOL = '/'; // tick
   private static char NOT_DONE_SYMBOL = 'X'; //cross
   private boolean isDone = false;
   private String description;
 
-  Task(String description) {
+  public Task(String description) {
     this.description = description;
   }
 
@@ -15,13 +15,15 @@ public class Task {
     this.isDone = true;
   }
 
+  public abstract char symbol();
+
   @Override
   public String toString() {
-    return String.format("[%c] %s", getStatusIcon(), description);
+    return String.format("[%c][%c] %s", symbol(), getStatusIcon(), description);
   }
 
   public String serialise() {
-    return String.format("%b %s", isDone, description);
+    return String.format("%c %b %s", symbol(), isDone, description);
   }
 
   private char getStatusIcon() {

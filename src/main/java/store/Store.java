@@ -6,28 +6,44 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import ui.Ui;
+import type.ErrorOutputter;
 
 public class Store {
 
-  private static final String SAVE_FILE_PATH = "data.txt";
+  private static final String DEFAULT_SAVE_FILE_PATH = "data.txt";
+  private String filePath = Store.DEFAULT_SAVE_FILE_PATH;
+  private ErrorOutputter errorOutputter;
 
-  public static Scanner retrieveDataAsScanner() {
+  public Store() {
+
+  }
+
+  public Store(ErrorOutputter errorOutputter) {
+    this.errorOutputter = errorOutputter;
+  }
+
+  public Store(String filePath, ErrorOutputter errorOutputter) {
+    this.filePath = filePath;
+    this.errorOutputter = errorOutputter;
+  }
+
+  public Scanner retrieveDataAsScanner() {
     try {
-      return new Scanner(new File(Store.SAVE_FILE_PATH));
+      return new Scanner(new File(filePath));
     } catch (FileNotFoundException e) {
       saveDataIntoFile("");
       return retrieveDataAsScanner();
     }
   }
 
-  public static void saveDataIntoFile(String data) {
+  public void saveDataIntoFile(String data) {
     try {
-      BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(Store.SAVE_FILE_PATH));
+      BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
       bufferedWriter.write(data);
       bufferedWriter.flush();
+      bufferedWriter.close();
     } catch (IOException e) {
-      Ui.error("Opps! Unable to save to file.");
+      errorOutputter.accept("Opps! Unable to save to file.");
     }
   }
 }

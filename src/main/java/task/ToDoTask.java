@@ -9,11 +9,7 @@ public class ToDoTask extends Task {
   }
 
   @Override
-  public String toString() {
-    return String.format("[%c]%s", ToDoTask.TO_DO_SYMBOL, super.toString());
-  }
-
-  public String serialise() {
-    return String.format("%c %s", ToDoTask.TO_DO_SYMBOL, super.serialise());
+  public char symbol() {
+    return ToDoTask.TO_DO_SYMBOL;
   }
 }
