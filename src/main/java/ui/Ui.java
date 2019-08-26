@@ -1,7 +1,7 @@
 package ui;
 
 /**
- * Displayer of results to the user
+ * Displayer of results to the user.
  */
 public class Ui {
 

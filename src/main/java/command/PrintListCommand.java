@@ -1,7 +1,7 @@
 package command;
 
 /**
- * Command to print the Task list,
+ * Command to print the Task list.
  */
 public class PrintListCommand implements Command {
 

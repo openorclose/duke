@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import store.Store;
 
 public class StoreTest {
+
   private static String testFile;
   private static final String testData = "123123";
 
@@ -31,7 +32,7 @@ public class StoreTest {
     assertEquals(0, ui.getErrorsSize());
     int lines = 0;
     while (scanner.hasNextLine()) {
-      lines ++;
+      lines++;
       if (lines == 1) {
         assertEquals(testData, scanner.nextLine());
       } else {

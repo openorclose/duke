@@ -27,7 +27,7 @@ public abstract class Task {
   }
 
   /**
-   * The char representing the task
+   * The char representing the task.
    *
    * @return the char
    */
@@ -39,7 +39,7 @@ public abstract class Task {
   }
 
   /**
-   * Serialize task for easier storage
+   * Serialize task for easier storage.
    *
    * @return the serialized string
    */

@@ -9,7 +9,7 @@ import java.util.Scanner;
 import type.ErrorOutputter;
 
 /**
- * Task storer and retriever
+ * Task storer and retriever.
  */
 public class Store {
 

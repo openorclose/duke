@@ -8,10 +8,9 @@ import type.ErrorOutputter;
 import ui.Ui;
 
 /**
- * Utility methods for parsing
- *
- * Parser requires a Function<String, T>, so these methods help to take in
- * functions with other types and returns a function of the proper one.
+ * Utility methods for parsing Parser requires a Function taking in a string and returning a task,
+ * so these methods help to
+ * take in functions with other types and returns a function of the proper one.
  */
 public class ParserUtils {
 
@@ -22,7 +21,7 @@ public class ParserUtils {
    * @param errorOutputter the error outputter
    * @return the transformed consumer
    */
- public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer,
+  public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer,
       ErrorOutputter errorOutputter) {
     return integerString -> {
       try {
@@ -36,7 +35,7 @@ public class ParserUtils {
   /**
    * Converts a function splitting at first space.
    *
-   * @param <R>        the type parameter
+   * @param <R> the type parameter
    * @param biFunction the bi function
    * @return the transformed function
    */
@@ -67,7 +66,7 @@ public class ParserUtils {
   /**
    * Converts function to parse two arguments.
    *
-   * @param <R>            the type parameter of the parser
+   * @param <R>              the type parameter of the parser
    * @param splitAt        the string to split at
    * @param biFunction     the BiFunction
    * @param errorOutputter the error outputter

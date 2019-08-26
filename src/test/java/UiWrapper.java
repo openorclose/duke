@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import ui.Ui;
 
+/**
+ * The type Ui wrapper that outputs to an arraylist for easier tesing.
+ */
 public class UiWrapper extends Ui {
 
   private ArrayList<String> printedMessages = new ArrayList<>();
@@ -28,10 +31,20 @@ public class UiWrapper extends Ui {
     printedMessages.add(message + "\n");
   }
 
+  /**
+   * Gets messages size.
+   *
+   * @return the messages size
+   */
   public int getMessagesSize() {
     return printedMessages.size();
   }
 
+  /**
+   * Gets last message.
+   *
+   * @return the last message
+   */
   public String getLastMessage() {
     if (printedMessages.size() == 0) {
       return null;
@@ -39,10 +52,20 @@ public class UiWrapper extends Ui {
     return printedMessages.get(printedMessages.size() - 1);
   }
 
+  /**
+   * Gets errors size.
+   *
+   * @return the errors size
+   */
   public int getErrorsSize() {
     return errorMessages.size();
   }
 
+  /**
+   * Gets last error.
+   *
+   * @return the last error
+   */
   public String getLastError() {
     if (errorMessages.size() == 0) {
       return null;
@@ -50,6 +73,11 @@ public class UiWrapper extends Ui {
     return errorMessages.get(errorMessages.size() - 1);
   }
 
+  /**
+   * Returns true if exit called, false if not.
+   *
+   * @return whether exit was called
+   */
   public boolean wasExitCalled() {
     return wasExitCalled;
   }
