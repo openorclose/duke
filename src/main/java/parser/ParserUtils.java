@@ -7,8 +7,21 @@ import java.util.function.Function;
 import type.ErrorOutputter;
 import ui.Ui;
 
+/**
+ * Utility methods for parsing
+ *
+ * Parser requires a Function<String, T>, so these methods help to take in
+ * functions with other types and returns a function of the proper one.
+ */
 public class ParserUtils {
 
+  /**
+   * Converts a consumer expecting an integer as the argument .
+   *
+   * @param consumer       the consumer
+   * @param errorOutputter the error outputter
+   * @return the transformed consumer
+   */
   public static Consumer<String> generateConsumerExpectingInteger(Consumer<Integer> consumer, ErrorOutputter errorOutputter) {
     return integerString -> {
       try {
@@ -19,6 +32,13 @@ public class ParserUtils {
     };
   }
 
+  /**
+   * Converts a function splitting at first space.
+   *
+   * @param <R>        the type parameter
+   * @param biFunction the bi function
+   * @return the transformed function
+   */
   public static <R> Function<String, R> generateFunctionSplittingAtFirstSpace(
       BiFunction<String, String, R> biFunction) {
     return spaceSeparatedString -> {
@@ -27,6 +47,14 @@ public class ParserUtils {
     };
   }
 
+  /**
+   * Converts consumer to parse two arguments.
+   *
+   * @param splitAt        the string to split split at
+   * @param consumer       the consumer
+   * @param errorOutputter the error outputter
+   * @return the transformed consumer
+   */
   public static Consumer<String> generateConsumerToParseTwoArguments(String splitAt,
       BiConsumer<String, String> consumer, ErrorOutputter errorOutputter) {
     return argumentString -> generateFunctionToParseTwoArguments(splitAt, (left, right) -> {
@@ -35,6 +63,15 @@ public class ParserUtils {
     }, errorOutputter).apply(argumentString);
   }
 
+  /**
+   * Converts function to parse two arguments.
+   *
+   * @param <R>            the type parameter of the parser
+   * @param splitAt        the string to split at
+   * @param biFunction     the BiFunction
+   * @param errorOutputter the error outputter
+   * @return the transformed function
+   */
   public static <R> Function<String, R> generateFunctionToParseTwoArguments(String splitAt,
       BiFunction<String, String, R> biFunction, ErrorOutputter errorOutputter) {
     return argumentString -> {

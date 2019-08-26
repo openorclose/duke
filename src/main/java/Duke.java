@@ -14,6 +14,9 @@ import store.Store;
 import task.Task;
 import ui.Ui;
 
+/**
+ * A task reminder command line application.
+ */
 public class Duke {
 
   private Scanner scanner = new Scanner(System.in);
@@ -28,12 +31,23 @@ public class Duke {
 
   private Store store = new Store(ui::error);
 
+  /**
+   * The entry point of application.
+   *
+   * @param args (unused)
+   */
   public static void main(String[] args) {
     Duke duke = new Duke();
     duke.printWelcome();
     duke.startRepl();
   }
 
+  /**
+   * Instantiates a new Duke.
+   *
+   * @param ui    the ui to output to the user
+   * @param store the store to store and retrieve tasks
+   */
   public Duke(Ui ui, Store store) {
     this.ui = ui;
     this.store = store;
@@ -41,6 +55,9 @@ public class Duke {
     init();
   }
 
+  /**
+   * Instantiates a new Duke.
+   */
   public Duke() {
     taskParser = new TaskParser(ui);
     init();
@@ -75,6 +92,11 @@ public class Duke {
     }
   }
 
+  /**
+   * Parses and executes command.
+   *
+   * @param command command to execute
+   */
   public void parseAndExecuteCommand(String command) {
     commandParser.parseAndExecuteCommand(command);
     saveListToDisk();
@@ -89,7 +111,7 @@ public class Duke {
   }
 
   private void saveListToDisk() {
-    store.saveDataIntoFile(list.stream().map(Task::serialise).collect(Collectors.joining("\n")));
+    store.saveDataIntoFile(list.stream().map(Task::serialize).collect(Collectors.joining("\n")));
   }
 
   private void findInListThenMarkAsDone(int oneBasedIndex) {

@@ -1,5 +1,8 @@
 package task;
 
+/**
+ * The type Task.
+ */
 public abstract class Task {
 
   private static char DONE_SYMBOL = '/'; // tick
@@ -7,14 +10,27 @@ public abstract class Task {
   private boolean isDone = false;
   private String description;
 
+  /**
+   * Instantiates a new Task.
+   *
+   * @param description the description
+   */
   public Task(String description) {
     this.description = description;
   }
 
+  /**
+   * Mark as done.
+   */
   public void markAsDone() {
     this.isDone = true;
   }
 
+  /**
+   * The char representing the task
+   *
+   * @return the char
+   */
   public abstract char symbol();
 
   @Override
@@ -22,7 +38,12 @@ public abstract class Task {
     return String.format("[%c][%c] %s", symbol(), getStatusIcon(), description);
   }
 
-  public String serialise() {
+  /**
+   * Serialize task for easier storage
+   *
+   * @return the serialized string
+   */
+  public String serialize() {
     return String.format("%c %b %s", symbol(), isDone, description);
   }
 

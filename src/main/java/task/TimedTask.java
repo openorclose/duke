@@ -15,10 +15,10 @@ public abstract class TimedTask extends Task {
   public abstract String separator();
 
   @Override
-  public String serialise() {
+  public String serialize() {
     return String.format(
         "%s /%s %s",
-        super.serialise(),
+        super.serialize(),
         separator(),
         DateParser.dateToString(time)
     );

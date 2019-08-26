@@ -1,6 +1,5 @@
 package parser;
 
-import command.task.AddTaskCommand;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.function.BiFunction;
@@ -12,10 +11,18 @@ import task.ToDoTask;
 import type.ErrorOutputter;
 import ui.Ui;
 
+/**
+ * Parser to parse tasks.
+ */
 public class TaskParser {
 
   private Parser<Task> parser;
 
+  /**
+   * Instantiates a new Task parser.
+   *
+   * @param ui the ui
+   */
   public TaskParser(Ui ui) {
     this.parser = new Parser<>(ui);
     addTaskSubParser(ToDoTask.TO_DO_SYMBOL, ToDoTask::new);
@@ -41,10 +48,24 @@ public class TaskParser {
     parser.addSubParser(String.valueOf(type), isDoneIntermediateParser);
   }
 
+  /**
+   * Converts a serialized Task into a proper Task.
+   *
+   * @param serial the serialized task
+   * @return the task
+   */
   public Task fromSerial(String serial) {
     return parser.parse(serial);
   }
 
+  /**
+   * Generate TimedTask parser function.
+   *
+   * @param separator            the separator
+   * @param timedTaskConstructor the TimedTask constructor
+   * @param errorOutputter       the error outputter
+   * @return the parser
+   */
   public static Function<String, Task> generateTimedTaskParser(
       String separator,
       BiFunction<String, LocalDateTime, Task> timedTaskConstructor,

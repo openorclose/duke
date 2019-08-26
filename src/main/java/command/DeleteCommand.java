@@ -4,11 +4,20 @@ import java.util.function.Consumer;
 import parser.ParserUtils;
 import type.ErrorOutputter;
 
+/**
+ * Command to delete a task.
+ */
 public class DeleteCommand implements Command {
 
   private ErrorOutputter errorOutputter;
   private final Consumer<Integer> deleter;
 
+  /**
+   * Instantiates a new DeleteCommand.
+   *
+   * @param errorOutputter the error outputter
+   * @param deleter        the deleter
+   */
   public DeleteCommand(ErrorOutputter errorOutputter, Consumer<Integer> deleter) {
     this.errorOutputter = errorOutputter;
     this.deleter = deleter;
