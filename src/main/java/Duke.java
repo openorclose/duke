@@ -5,77 +5,28 @@ public class Duke implements Serializable {
     // constants
     private static final String INDENT = "    ";
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
-    private static final String SAVE_LOCATION = "data/duke.txt";
 
     // main loop behavior constants
     private static final int CONTINUE = 1;
     private static final int EXIT = 2;
 
     // class members
-    // iostreams
-    private InputStream inStream;
-    private BufferedReader in;
-    private OutputStream outStream;
-    private Writer out;
     // data members
-    private List<Task> todoList;
-
-    private boolean Save() {
-        try {
-            FileOutputStream fileOut;
-            File file = new File(SAVE_LOCATION);
-            file.createNewFile();
-            fileOut = new FileOutputStream(file);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(this.todoList);
-            out.close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    private boolean Load() {
-        try {
-            FileInputStream fileIn;
-            File file = new File(SAVE_LOCATION);
-            file.createNewFile();
-            fileIn = new FileInputStream(file);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            List<Task> incomingList = (List) in.readObject();
-            this.todoList = incomingList;
-            in.close();
-            return true;
-        } catch (IOException | ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-    public boolean copyState(Duke other) {
-        try {
-            this.todoList = other.getList();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public List<Task> getList() {
-        return new ArrayList(todoList);
-    }
+    private Ui ui;
+    private TaskList todoList;
+    private Storage storage;
+    private Parser parser;
 
     public static void main(String[] args) {
-        new Duke(System.in, System.out).run();
+        new Duke(System.in, System.out, "data/duke.txt").run();
     }
 
     // takes in a input stream and output stream
-    public Duke(InputStream inStream, OutputStream outStream) {
-        this.inStream = inStream;
-        this.in = new BufferedReader(new InputStreamReader(inStream));
-        this.outStream = outStream;
-        this.out = new PrintWriter(outStream);
+    public Duke(InputStream inStream, OutputStream outStream, String saveLocation) {
+        this.ui = Ui.newUi(inStream, outStream);
 
-        this.todoList = new ArrayList<>();
+        this.todoList = TaskList.newTaskList();
+        this.storage = Storage.newStorage(saveLocation);
     }
 
     // runs duke
@@ -85,36 +36,24 @@ public class Duke implements Serializable {
         int returnCode = 0;
         try {
             greet();
-            Load();
+            Object obj = storage.load();
+            todoList = obj == null ? TaskList.newTaskList() : (TaskList) obj;
             mainLoop();
         } catch (IOException e) {
             e.printStackTrace();
             returnCode = 1;
         } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e1) {
-
-            }
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e2) {
-
-            }
+            ui.close();
         }
         return returnCode;
     }
 
     // prints out bye message to out stream
     private void bye() throws IOException {
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.write(String.format("%s Bye. Hope to see you again soon!\n", INDENT));
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.write(String.format("%s Bye. Hope to see you again soon!\n", INDENT));
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
     }
 
     // main update loop where processinput is continuously called
@@ -132,33 +71,38 @@ public class Duke implements Serializable {
     // returns EXIT if signalling to exit main loop
     // returns CONTINUE if to continue with loop
     private int processInput() throws IOException {
-        String command = in.readLine();
+        String command = ui.readLine();
         if (command == null) {
             // EOF
             return EXIT;
         }
         try {
-            if (command.equals("bye")) {
+            String[] commandArgs = Parser.returnArgs(command);
+            switch (commandArgs[0]){
+            case "bye":
                 return EXIT;
-            } else if (command.equals("list")) {
-                listList(command);
-                // check if it is `done` command
-            } else if (command.matches("(done )[\\d]{1,9}")) {
-                done(command);
-                // verify command is correct for delete
-            } else if (command.matches("(delete )[\\d]{1,9}")) {
-                delete(command);
-                // verify command is correct for todo/deadline/event
-            } else if (command.matches("(todo|deadline|event).*")) {
-                addToList(command);
-            } else {
+            case "list":
+                listList(commandArgs);
+                break;
+            case "done":
+                done(commandArgs);
+                break;
+            case "delete":
+                delete(commandArgs);
+                break;
+            case "todo":
+            case "deadline":
+            case "event":
+                addToList(commandArgs);
+                break;
+            default:
                 throw new DukeException("\u2639 OOPS!!! I'm sorry, but I don't know what that means :-(");
             }
         } catch (DukeException e) {
-            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-            out.write(String.format("%s %s\n", INDENT, e.getMessage()));
-            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-            out.flush();
+            ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            ui.write(String.format("%s %s\n", INDENT, e.getMessage()));
+            ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            ui.flush();
         }
         return CONTINUE;
     }
@@ -166,117 +110,119 @@ public class Duke implements Serializable {
     // input expected: "delete n"
     // deletes task n
     // throws duke exception if there is no task n
-    private void delete(String command) throws IOException, DukeException {
-        Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
-        int thingToDo = sc.nextInt(); // one indexed
+    private void delete(String[] args) throws IOException, DukeException {
+        if (args.length != 2){
+            throw new DukeException("\u2639 OOPS!!! Done function needs exactly one argument.");
+        }
+        if (!args[1].matches("\\d{1,9}")){
+            throw new DukeException("\u2639 OOPS!!! Task number is too big.");
+        }
+        int thingToDo = Integer.parseInt(args[1]);
         Task removedTask;
         try {
             removedTask = todoList.remove(thingToDo - 1);
-            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-            out.write(String.format("%s Noted. I've removed this task: \n", INDENT));
-            out.write(String.format("%s   %s\n", INDENT, removedTask));
-            out.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
-            out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-            out.flush();
+            ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            ui.write(String.format("%s Noted. I've removed this task: \n", INDENT));
+            ui.write(String.format("%s   %s\n", INDENT, removedTask));
+            ui.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
+            ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+            ui.flush();
         } catch (IndexOutOfBoundsException e) {
             throw new DukeException(String.format("\u2639 OOPS!!! There is no task %d.", thingToDo));
         }
-        Save();
+        storage.save(todoList);
     }
 
     // input expected: "done n"
     // marks task n as done
     // throws duke exception if there is no task n
-    private void done(String command) throws IOException, DukeException {
-        Scanner sc = new Scanner(command).useDelimiter("[\\D]+");
-        int thingToDo = sc.nextInt(); // one indexed
+    private void done(String[] args) throws IOException, DukeException {
+        if (args.length != 2){
+            throw new DukeException("\u2639 OOPS!!! Done function needs exactly one argument.");
+        }
+        if (!args[1].matches("\\d{1,9}")){
+            throw new DukeException("\u2639 OOPS!!! Task number is too big.");
+        }
+        int thingToDo = Integer.parseInt(args[1]);
         try {
             todoList.get(thingToDo - 1).setState(Task.DONE);
         } catch (IndexOutOfBoundsException e) {
             throw new DukeException(String.format("\u2639 OOPS!!! There is no task %d.", thingToDo));
         }
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.write(String.format("%s Nice! I've marked this task as done: \n", INDENT));
-        out.write(String.format("%s   %s\n", INDENT, todoList.get(thingToDo - 1)));
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
-        Save();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.write(String.format("%s Nice! I've marked this task as done: \n", INDENT));
+        ui.write(String.format("%s   %s\n", INDENT, todoList.get(thingToDo - 1)));
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
+        storage.save(todoList);
     }
 
     // input expected: "list"
     // input not checked
     // prints out list of tasks to out stream
-    private void listList(String command) throws IOException {
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+    private void listList(String[] args) throws IOException {
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
         int counter = 1;
         for (Task item : todoList) {
-            out.write(String.format("%s %d.%s\n", INDENT, counter++, item));
+            ui.write(String.format("%s %d.%s\n", INDENT, counter++, item));
         }
         if (counter == 1) {
-            out.write(String.format("%s Such empty, much wow\n", INDENT));
+            ui.write(String.format("%s Such empty, much wow\n", INDENT));
         }
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
     }
 
 
-    private void addToList(String command) throws IOException, DukeException {
-        if (command.matches("(.*(?<=\\s)(/at|/by)(?>\\s|$|\\z).*){2,}")) {
-            throw new DukeException("\u2639 OOPS!!! There are too many flags in the Task.");
-        }
-        Scanner sc = new Scanner(command).useDelimiter("((?<=todo)|(?<=deadline)|(?<=event)|(?<=\\s)/at|(?<=\\s)/by)(?>[\\s$])");
-        String typeOfTask = sc.next();
-        switch (typeOfTask) {
+    private void addToList(String[] args) throws IOException, DukeException {
+        switch (args[0]) {
         case "todo":
+            if(args.length != 2){
+                throw new DukeException("\u2639 OOPS!!! Todo must have exactly one argument.");
+            }
             try {
-                todoList.add(Task.parseTodo(sc.next().trim()));
+                todoList.add(Task.parseTodo(args[1]));
             } catch (NoSuchElementException e) {
                 throw new DukeException("\u2639 OOPS!!! The description of a todo cannot be empty.");
             }
             break;
         case "deadline":
-            if (!command.matches("deadline.*/by.*")) {
-                throw new DukeException("\u2639 OOPS!!! A deadline must have a /by flag.");
-            }
             try {
-                todoList.add(Task.parseDeadline(sc.next().trim(), sc.next().trim()));
-            } catch (NoSuchElementException e) {
+                todoList.add(Task.parseDeadline(args[1], args[2]));
+            } catch (ArrayIndexOutOfBoundsException e) {
                 throw new DukeException("\u2639 OOPS!!! A deadline must have a description and a date.");
             }
             break;
         case "event":
-            if (!command.matches("event.*/at.*")) {
-                throw new DukeException("\u2639 OOPS!!! An event must have a /at flag.");
-            }
             try {
-                todoList.add(Task.parseEvent(sc.next().trim(), sc.next().trim()));
-            } catch (NoSuchElementException e) {
+                todoList.add(Task.parseEvent(args[1], args[2]));
+            } catch (ArrayIndexOutOfBoundsException e) {
                 throw new DukeException("\u2639 OOPS!!! An event must have a description and a date.");
             }
             break;
         }
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.write(String.format("%s Got it. I've added this task: \n", INDENT));
-        out.write(String.format("%s   %s\n", INDENT, todoList.get(todoList.size() - 1)));
-        out.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
-        Save();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.write(String.format("%s Got it. I've added this task: \n", INDENT));
+        ui.write(String.format("%s   %s\n", INDENT, todoList.get(todoList.size() - 1)));
+        ui.write(String.format("%s  Now you have %d tasks in the list.\n", INDENT, todoList.size()));
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
+        storage.save(todoList);
     }
 
     private void echo(String command) throws IOException {
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.write(String.format("%s%s\n", INDENT, command));
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.write(String.format("%s%s\n", INDENT, command));
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
     }
 
     private void greet() throws IOException {
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.write(String.format("%s Hello! I'm Duke\n", INDENT));
-        out.write(String.format("%s What can I do for you?\n", INDENT));
-        out.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
-        out.flush();
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.write(String.format("%s Hello! I'm Duke\n", INDENT));
+        ui.write(String.format("%s What can I do for you?\n", INDENT));
+        ui.write(String.format("%s%s\n", INDENT, HORIZONTAL_LINE));
+        ui.flush();
     }
 
 }

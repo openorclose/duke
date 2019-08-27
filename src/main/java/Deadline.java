@@ -11,7 +11,7 @@ public class Deadline extends Task{
         try{
             dateTime = new SimpleDateFormat("dd/MM/yyyy HHmm").parse(date);
         }catch (ParseException e){
-            e.printStackTrace();
+            // e.printStackTrace();
             this.date = date;
         }
     }
