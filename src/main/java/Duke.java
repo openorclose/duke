@@ -13,7 +13,7 @@ public class Duke implements Serializable {
     // class members
     // data members
     private Ui ui;
-    private TaskList todoList;
+    private TaskList<Task> todoList;
     private Storage storage;
     private Parser parser;
 
@@ -25,7 +25,7 @@ public class Duke implements Serializable {
     public Duke(InputStream inStream, OutputStream outStream, String saveLocation) {
         this.ui = Ui.newUi(inStream, outStream);
 
-        this.todoList = TaskList.newTaskList();
+        this.todoList = new TaskList();
         this.storage = Storage.newStorage(saveLocation);
     }
 
@@ -37,7 +37,7 @@ public class Duke implements Serializable {
         try {
             greet();
             Object obj = storage.load();
-            todoList = obj == null ? TaskList.newTaskList() : (TaskList) obj;
+            todoList = obj == null ? new TaskList() : (TaskList) obj;
             mainLoop();
         } catch (IOException e) {
             e.printStackTrace();
