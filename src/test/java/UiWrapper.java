@@ -4,7 +4,7 @@ import ui.Ui;
 /**
  * The type Ui wrapper that outputs to an arraylist for easier tesing.
  */
-public class UiWrapper extends Ui {
+public class UiWrapper implements Ui {
 
   private ArrayList<String> printedMessages = new ArrayList<>();
   private ArrayList<String> errorMessages = new ArrayList<>();

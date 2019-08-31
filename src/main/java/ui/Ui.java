@@ -1,54 +1,47 @@
 package ui;
 
 /**
- * Displayer of results to the user.
+ * The Ui interface to interact with the user.
  */
-public class Ui {
+public interface Ui {
 
   /**
-   * Print without new line.
+   * Print.
    *
    * @param string the string
    */
-  public void print(String string) {
-    System.out.print(string);
-  }
+  void print(String string);
 
   /**
-   * Print with new line.
+   * Println.
    *
    * @param string the string
    */
-  public void println(String string) {
-    System.out.println(string);
+  default void println(String string) {
+    print(string + '\n');
   }
 
   /**
-   * Print using a format.
+   * Printf.
    *
    * @param format the format
    * @param args   the args
    */
-  public void printf(String format, Object... args) {
-    System.out.printf(format, args);
+  default void printf(String format, Object... args) {
+    print(String.format(format, args));
   }
 
   /**
-   * Print an error.
+   * Error.
    *
    * @param message the message
    */
-  public void error(String message) {
-    System.out.println(message);
-  }
+  void error(String message);
 
   /**
-   * Exits the application.
+   * Exit.
    *
    * @param message the message
    */
-  public void exit(String message) {
-    System.out.println(message);
-    System.exit(0);
-  }
+  void exit(String message);
 }

@@ -13,6 +13,7 @@ import parser.CommandParser;
 import parser.TaskParser;
 import store.Store;
 import task.Task;
+import ui.CommandLineUi;
 import ui.Ui;
 
 /**
@@ -24,7 +25,7 @@ public class Duke {
 
   private ArrayList<Task> list = new ArrayList<>();
 
-  private Ui ui = new Ui();
+  private Ui ui = new CommandLineUi();
 
   private CommandParser commandParser;
 
@@ -43,6 +44,10 @@ public class Duke {
     duke.startRepl();
   }
 
+  public Duke(Ui ui) {
+    this(ui, new Store(ui::error));
+  }
+
   /**
    * Instantiates a new Duke.
    *
@@ -53,7 +58,7 @@ public class Duke {
     this.ui = ui;
     this.store = store;
     taskParser = new TaskParser(ui);
-    init();
+    initalizeParser();
   }
 
   /**
@@ -61,10 +66,10 @@ public class Duke {
    */
   public Duke() {
     taskParser = new TaskParser(ui);
-    init();
+    initalizeParser();
   }
 
-  private void init() {
+  private void initalizeParser() {
     commandParser = new CommandParser(ui);
     commandParser.add(new ByeCommand(ui::exit));
     commandParser.add(new PrintListCommand(this::printList));
