@@ -68,8 +68,6 @@ public class DukeTest {
     Duke duke = new Duke(ui, new Store("testing.txt", ui::error));
     duke.parseAndExecuteCommand("todo abc");
     duke.parseAndExecuteCommand("event 123123 /at 12/12/2018 2000");
-
-    duke = new Duke(ui, new Store("testing.txt", ui::error));
     duke.parseAndExecuteCommand("list");
     assertEquals("2. [E][X] 123123 (:at 12/12/2018 2000)\n", ui.getLastMessage());
     duke.parseAndExecuteCommand("delete 1");

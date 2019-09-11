@@ -20,7 +20,8 @@ public class FindCommand implements Command {
    * @param finder the finder
    */
   public FindCommand(Ui ui, Function<String, ArrayList<Task>> finder) {
-
+    assert(ui != null);
+    assert(ui != null);
     this.ui = ui;
     this.finder = finder;
   }
