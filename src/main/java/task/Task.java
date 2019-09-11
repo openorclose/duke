@@ -54,4 +54,8 @@ public abstract class Task {
   public boolean matches(String query) {
     return description.toLowerCase().contains(query.toLowerCase());
   }
+
+  public boolean isDone() {
+    return this.isDone;
+  }
 }

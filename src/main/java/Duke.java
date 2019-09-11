@@ -3,6 +3,7 @@ import command.DeleteCommand;
 import command.FindCommand;
 import command.MarkAsDoneCommand;
 import command.PrintListCommand;
+import command.ShowStatisticsCommand;
 import command.task.AddDeadlineTaskCommand;
 import command.task.AddEventTaskCommand;
 import command.task.AddTodoTaskCommand;
@@ -79,6 +80,7 @@ public class Duke {
     commandParser.add(new AddEventTaskCommand(ui::error, this::addTaskToList));
     commandParser.add(new AddDeadlineTaskCommand(ui::error, this::addTaskToList));
     commandParser.add(new FindCommand(ui, this::findTasksMatchingQuery));
+    commandParser.add(new ShowStatisticsCommand(ui::error, this::statisticsPrinter));
     loadFromDiskToList();
   }
 
@@ -169,5 +171,10 @@ public class Duke {
         .stream()
         .filter(task -> task.matches(query))
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private void statisticsPrinter() {
+    double percentDone = list.stream().filter(task -> task.isDone()).count() / (double) list.size() * 100;
+    ui.println("You have completed " + percentDone + "% of your tasks!" );
   }
 }
