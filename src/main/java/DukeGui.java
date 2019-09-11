@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.function.Consumer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -85,11 +86,7 @@ public class DukeGui extends Application implements Ui {
 
   @Override
   public void exit(String message) {
-    try {
-      stop();
-    } catch (Exception e) {
-      error("Opps! I could not exit. Please try again!");
-    }
+    Platform.exit();
   }
 
   @Override

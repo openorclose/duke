@@ -13,6 +13,7 @@ public class PrintListCommand implements Command {
    * @param listPrinter the list printer
    */
   public PrintListCommand(Runnable listPrinter) {
+    assert(listPrinter != null);
     this.listPrinter = listPrinter;
   }
 
