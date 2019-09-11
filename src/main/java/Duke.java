@@ -133,6 +133,7 @@ public class Duke {
     list.add(task);
     ui.println("Got it. I've added this task: ");
     ui.println(task.toString());
+    printNumberOfItemsInList();
   }
 
   private void findInListThenDelete(int oneBasedIndex) {

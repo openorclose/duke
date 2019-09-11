@@ -19,6 +19,7 @@ import ui.Ui;
  */
 public class DukeGui extends Application implements Ui {
 
+  public static final String FX_BACKGROUND_COLOR = "-fx-background-color: ";
   /**
    * The scroll pane.
    */
@@ -69,7 +70,7 @@ public class DukeGui extends Application implements Ui {
 
   private void appendText(String text, Color color) {
     Label label = new Label();
-    label.setStyle("-fx-background-color: " + color.toString());
+    label.setStyle(FX_BACKGROUND_COLOR + color.toString());
     label.setText(text);
     outputVBox.getChildren().add(label);
   }
