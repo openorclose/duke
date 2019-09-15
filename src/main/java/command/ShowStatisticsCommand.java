@@ -2,11 +2,20 @@ package command;
 
 import type.ErrorOutputter;
 
+/**
+ * Command to show statistics.
+ */
 public class ShowStatisticsCommand implements Command {
 
   private final ErrorOutputter errorOutputter;
   private final Runnable statisticsPrinter;
 
+  /**
+   * Instantiates a new Show statistics command.
+   *
+   * @param errorOutputter    the error outputter
+   * @param statisticsPrinter the statistics printer
+   */
   public ShowStatisticsCommand(ErrorOutputter errorOutputter, Runnable statisticsPrinter) {
 
     this.errorOutputter = errorOutputter;

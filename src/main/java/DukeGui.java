@@ -19,7 +19,7 @@ import ui.Ui;
  */
 public class DukeGui extends Application implements Ui {
 
-  public static final String FX_BACKGROUND_COLOR = "-fx-background-color: ";
+  private static final String FX_BACKGROUND_COLOR = "-fx-background-color: ";
   /**
    * The scroll pane.
    */
@@ -96,6 +96,7 @@ public class DukeGui extends Application implements Ui {
     Scene scene = new Scene(root);
 
     stage.setScene(scene);
+    stage.setTitle("DUKE");
     stage.show();
     root.requestFocus();
   }

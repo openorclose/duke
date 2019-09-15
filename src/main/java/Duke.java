@@ -117,6 +117,7 @@ public class Duke {
       String serialized = saveFileScanner.nextLine();
       list.add(taskParser.fromSerial(serialized));
     }
+    saveFileScanner.close();
   }
 
   private void saveListToDisk() {
@@ -175,6 +176,6 @@ public class Duke {
 
   private void statisticsPrinter() {
     double percentDone = list.stream().filter(task -> task.isDone()).count() / (double) list.size() * 100;
-    ui.println("You have completed " + percentDone + "% of your tasks!" );
+    ui.println("You have completed " + percentDone + "% of your tasks!");
   }
 }
